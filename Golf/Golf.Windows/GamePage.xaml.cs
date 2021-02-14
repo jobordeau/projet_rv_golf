@@ -18,7 +18,7 @@ namespace Golf.Windows
 {
     public sealed partial class GamePage : Page
     {
-        readonly Game1 _game;
+        readonly Core.MiniGolf _game;
 
         public GamePage()
         {
@@ -26,7 +26,7 @@ namespace Golf.Windows
 
             // Create the game.
             var launchArguments = string.Empty;
-            _game = MonoGame.Framework.XamlGame<Game1>.Create(launchArguments, Window.Current.CoreWindow, swapChainPanel);
+            _game = MonoGame.Framework.XamlGame<MiniGolf>.Create(launchArguments, Window.Current.CoreWindow, swapChainPanel);
         }
     }
 }

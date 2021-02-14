@@ -1,25 +1,30 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Golf.Core.ModelGolf;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Golf.Core
 {
-    public class Game1 : Game
+    public class MiniGolf : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         //Camera
-        Vector3 camTarget;
-        Vector3 camPosition;
-        Matrix projectionMatrix;
-        Matrix viewMatrix;
-        Matrix worldMatrix;
+        Camera camera;
         //Geometric info
         Model model;
         //Orbit
         bool orbit = false;
-        public Game1()
+
+        //Model
+        BallManager ballManager;
+        GameManager scoreManager;
+        
+        //test model
+        Player player1;
+        public MiniGolf()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -28,22 +33,20 @@ namespace Golf.Core
         {
             base.Initialize();
             //Setup Camera
-            camTarget = new Vector3(0f, 0f, 0f);
-            camPosition = new Vector3(0f, 0f, -5);
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(
-                               MathHelper.ToRadians(45f), graphics.
-                               GraphicsDevice.Viewport.AspectRatio,
-                1f, 1000f);
-            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget,
-                         new Vector3(0f, 1f, 0f));// Y up
-            worldMatrix = Matrix.CreateWorld(camTarget, Vector3.
-                          Forward, Vector3.Up);
+            camera = Camera.GetCamera(graphics);
+
+            //test du modèle 
+            player1 = new Player(this, spriteBatch, graphics, "jojo");
+            scoreManager = new GameManager();
+            scoreManager.AddPlayer(player1);
+            ballManager = new BallManager(scoreManager.Players);
+
         }
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Content = new ContentManager(this.Services,"Content");
-            model = Content.Load<Model>("blue_ball");
+            model = Content.Load<Model>("StageTest");
         }
         protected override void UnloadContent()
         {
@@ -54,6 +57,9 @@ namespace Golf.Core
                 ButtonState.Pressed || Keyboard.GetState().IsKeyDown(
                 Keys.Escape))
                 Exit();
+
+            Vector3 camPosition = camera.CamPosition;
+            Vector3 camTarget = camera.CamTarget;
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
             {
                 camPosition.X -= 0.1f;
@@ -93,8 +99,11 @@ namespace Golf.Core
                 camPosition = Vector3.Transform(camPosition,
                               rotationMatrix);
             }
-            viewMatrix = Matrix.CreateLookAt(camPosition, camTarget,
+            camera.CamTarget = camTarget;
+            camera.CamPosition = camPosition;
+            camera.ViewMatrix = Matrix.CreateLookAt(camPosition, camTarget,
                          Vector3.Up);
+            ballManager.Update(gameTime);
             base.Update(gameTime);
         }
         protected override void Draw(GameTime gameTime)
@@ -106,12 +115,13 @@ namespace Golf.Core
                 {
                     //effect.EnableDefaultLighting();
                     effect.AmbientLightColor = new Vector3(1f, 0, 0);
-                    effect.View = viewMatrix;
-                    effect.World = worldMatrix;
-                    effect.Projection = projectionMatrix;
+                    effect.View = camera.ViewMatrix;
+                    effect.World = camera.WorldMatrix;
+                    effect.Projection = camera.ProjectionMatrix;
                 }
                 mesh.Draw();
             }
+            ballManager.Draw(gameTime);
             base.Draw(gameTime);
         }
     }

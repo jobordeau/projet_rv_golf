@@ -8,11 +8,11 @@ namespace Golf.IOS
     [Register("AppDelegate")]
     class Program : UIApplicationDelegate
     {
-        private static Game1 game;
+        private static Core.MiniGolf game;
 
         internal static void RunGame()
         {
-            game = new Game1();
+            game = new Core.MiniGolf();
             game.Run();
         }
 
