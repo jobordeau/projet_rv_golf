@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Golf.Core.ModelGolf.Cam;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,62 +10,76 @@ namespace Golf.Core.ModelGolf
 {
     public class Ball : GameObject
     {
-        private Model _texture;
-        public BoundingSphere BoundingSphere { get; set; }
-        public Vector3 Position { get; set; }
+        
         public Vector3 Velocity { get; set; }
+        private Vector3 lastVelocity;
+        public bool Moving { get; set; }
 
-        public Ball(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector3 position) : base(game, spriteBatch, graphics)
+        public Ball(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, ModelRender model) : base(game, spriteBatch, graphics,model)
         {
-            BoundingSphere = new BoundingSphere(new Vector3(Position.X, Position.Y, Position.Z),5); //comment obtenir le rayon d'un modèle 3D ?
-            Position = position;
             Velocity = Vector3.Zero;
+            lastVelocity = Vector3.Zero;
+            Moving = false;
             LoadContent();
         }
 
         protected override void LoadContent()
         {
             base.LoadContent();
-            _texture = Game.Content.Load<Model>("ball_red");
         }
 
-        public override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime, Camera camera)
         {
-            base.Draw(gameTime);
-            Camera camera = Camera.GetCamera(_graphics);
-            foreach (ModelMesh mesh in _texture.Meshes)
-            {
-                foreach (BasicEffect effect in mesh.Effects)
-                {
-                    //effect.EnableDefaultLighting();
-                    effect.AmbientLightColor = new Vector3(1f, 0, 0);
-                    effect.View = camera.ViewMatrix;
-                    effect.World = camera.WorldMatrix;
-                    effect.Projection = camera.ProjectionMatrix;
-                }
-                mesh.Draw();
-            }
+            if (camera.BoundingVolumeIsInView(_model.BoundingSphere))
+                _model.Draw(camera.View, camera.Projection);
         }
 
         public override void Update(GameTime gameTime)
         {
-            base.Update(gameTime);
-            Position = Vector3.Add(Position, Velocity);
 
+            base.Update(gameTime);
+            _model.Position = Vector3.Add(_model.Position, Velocity);
+            if (Velocity != Vector3.Zero)
+            {
+                if (!Moving)
+                {
+                    lastVelocity = Velocity;
+                    Moving = true;
+                }
+                
+                Velocity -= lastVelocity /100;
+                Velocity = new Vector3((float)Math.Round(Velocity.X,2), (float)Math.Round(Velocity.Y,2), (float)Math.Round(Velocity.Z,2));
+                Console.WriteLine(Velocity);
+            }
+            else
+            {
+                Moving = false;
+            }
+                
+            
             /*Tester si la balle est hors du terrain*/
         }
 
-        public void HandleBallCollision(Ball otherBall)
+        public override void HandleModelCollision(GameObject otherModel)
         {
-            if (BoundingSphere.Intersects(otherBall.BoundingSphere))
+            if(otherModel is Ball)
             {
-                Velocity = Vector3.Negate(Velocity);
-                otherBall.Velocity = Vector3.Negate(otherBall.Velocity);
+                Ball otherBall = (Ball)otherModel;
+                if (_model.BoundingSphere.Intersects(otherBall._model.BoundingSphere))
+                {
+                    Velocity = Vector3.Negate(Velocity);
+                    lastVelocity = Vector3.Negate(lastVelocity);
+
+                    otherBall.Velocity = Vector3.Negate(otherBall.Velocity);
+                    otherBall.lastVelocity = Vector3.Negate(otherBall.lastVelocity);
+                }
             }
+            
         }
 
 
 
 
     }
+
 }

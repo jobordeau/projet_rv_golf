@@ -12,18 +12,18 @@ namespace Golf.Core.ModelGolf
         public int NbWin { get; set; }
         public int NbHit { get; set; }
 
-        public Ball Ball { get; set; }
+        public ModelRender Ball { get; set; }
         public Player(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics,  string name)
         {
             Name = name;
             NbWin = 0;
             NbHit = 0;
-            Ball = new Ball(game, spriteBatch, graphics, new Vector3(10,10,10));
+            //Ball = new Ball(game, spriteBatch, graphics, new Vector3(10,10,10));
         }
 
         public void HitBall(Vector3 hitVelocity)
         {
-            Ball.Velocity = hitVelocity;
+            //Ball.Velocity = hitVelocity;
             NbHit++;
         }
 
