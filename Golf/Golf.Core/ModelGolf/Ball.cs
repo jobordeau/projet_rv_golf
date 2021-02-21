@@ -67,11 +67,15 @@ namespace Golf.Core.ModelGolf
                 Ball otherBall = (Ball)otherModel;
                 if (_model.BoundingSphere.Intersects(otherBall._model.BoundingSphere))
                 {
+
+                    otherBall.Velocity = Vector3.Negate(otherBall.Velocity) + Velocity/2;
+                    otherBall.lastVelocity = Vector3.Negate(otherBall.lastVelocity);
+                    otherBall.Velocity = Vector3.Round(otherBall.Velocity);
+
                     Velocity = Vector3.Negate(Velocity);
                     lastVelocity = Vector3.Negate(lastVelocity);
 
-                    otherBall.Velocity = Vector3.Negate(otherBall.Velocity);
-                    otherBall.lastVelocity = Vector3.Negate(otherBall.lastVelocity);
+                    
                 }
             }
             
