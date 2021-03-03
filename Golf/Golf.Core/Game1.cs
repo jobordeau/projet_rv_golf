@@ -44,6 +44,7 @@ namespace Golf.Core
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Content = new ContentManager(this.Services,"Content");
             model = Content.Load<Model>("StageTest");
+
         }
         protected override void UnloadContent()
         {
