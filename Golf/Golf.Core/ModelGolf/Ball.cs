@@ -24,6 +24,7 @@ namespace Golf.Core.ModelGolf
             Moving = false;
             
             LoadContent();
+            GetBounds();
         }
 
         protected override void LoadContent()
@@ -88,9 +89,6 @@ namespace Golf.Core.ModelGolf
             }
             
         }
-
-
-
 
     }
 
