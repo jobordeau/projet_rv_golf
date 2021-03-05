@@ -11,6 +11,7 @@ namespace Golf.Core.ModelGolf
     {
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
+        public Vector3 TargetRotation { get; set; }
         public Vector3 Scale { get; set; }
 
         public Model Model { get; private set; }
@@ -38,6 +39,7 @@ namespace Golf.Core.ModelGolf
 
             this.Position = Position;
             this.Rotation = Rotation;
+            this.TargetRotation = Rotation;
             this.Scale = Scale;
 
 
@@ -80,7 +82,11 @@ namespace Golf.Core.ModelGolf
                     effect.View = View;
                     effect.Projection = Projection;
 
-                    //effect.EnableDefaultLighting();
+                    /*effect.LightingEnabled = true; // turn on the lighting subsystem.
+                    effect.DirectionalLight0.DiffuseColor = new Vector3(0.5f, 0.5f, 0.5f);
+                    effect.DirectionalLight0.Direction = new Vector3(1, 0, 1);  // coming along the x-axis
+                    effect.DirectionalLight0.SpecularColor = new Vector3(1, 1, 1); // with green highlights
+                    effect.AmbientLightColor = new Vector3(1, 1, 1);*/
                 }
 
                 mesh.Draw();

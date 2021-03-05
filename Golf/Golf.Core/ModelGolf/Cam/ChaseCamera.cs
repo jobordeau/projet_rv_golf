@@ -49,7 +49,7 @@ namespace Golf.Core.ModelGolf.Cam
         public void Update(GameObject element)
         {
             // Move the camera to the new model's position and orientation
-            Move(element._model.Position, element._model.Rotation);
+            Move(element._model.Position, element._model.TargetRotation);
             
             // Sum the rotations of the model and the camera to ensure it 
             // is rotated to the correct position relative to the model's 

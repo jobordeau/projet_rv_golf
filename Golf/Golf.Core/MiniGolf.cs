@@ -20,7 +20,8 @@ namespace Golf.Core
         Ball ball;
         Level level;
 
-        bool charge;
+        Vector3 charge=Vector3.Zero;
+        Vector3 chargeMax = new Vector3(0, 0, -10);
 
         MouseState lastMouseState;
 
@@ -45,7 +46,7 @@ namespace Golf.Core
             modelManager.AddModel(level);
 
 
-            camera = new ChaseCamera(new Vector3(0, 400, 1500), new Vector3(0, 200, 0), new Vector3(0, 0, 0), GraphicsDevice);
+            camera = new ChaseCamera(new Vector3(0, 1000, 4000), new Vector3(0, 200, 0), new Vector3(0, 0, 0), GraphicsDevice);
         }
 
         // Called when the game should update itself
@@ -75,18 +76,37 @@ namespace Golf.Core
                 rotChange += new Vector3(0, 1, 0);
             if (keyState.IsKeyDown(Keys.D))
                 rotChange += new Vector3(0, -1, 0);
-            modelManager.elements[0]._model.Rotation += rotChange * .025f;
+            modelManager.elements[0]._model.TargetRotation += rotChange * .025f;
             // Determine what direction to move in
-            Matrix rotation = Matrix.CreateFromYawPitchRoll(modelManager.elements[0]._model.Rotation.Y, modelManager.elements[0]._model.Rotation.X, modelManager.elements[0]._model.Rotation.Z);
+            Matrix rotation = Matrix.CreateFromYawPitchRoll(modelManager.elements[0]._model.TargetRotation.Y, modelManager.elements[0]._model.TargetRotation.X, modelManager.elements[0]._model.TargetRotation.Z);
             // If space isn't down, the ship shouldn't move
             MouseState mouseState = Mouse.GetState();
 
             Ball ball = (Ball)modelManager.elements[0];
-            if (mouseState.LeftButton == ButtonState.Pressed && ball.Moving == false)
+            if (mouseState.LeftButton == ButtonState.Released && ball.Moving == false)
             {
-                ball.Velocity = Vector3.Transform(Vector3.Forward, rotation) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * 4;
-                ball.Velocity = Vector3.Round(ball.Velocity);
+                if(lastMouseState.LeftButton == ButtonState.Pressed)
+                {
+                    ball.Velocity = Vector3.Transform(charge, rotation) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * 4;
+                    ball.Velocity = Vector3.Round(ball.Velocity);
+                    charge = Vector3.Zero;
+                }
+                
             }
+
+            if(mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (!ball.Moving)
+                {
+                    if (!charge.Equals(chargeMax))
+                    {
+                        charge += new Vector3(0, 0, -0.2f);
+                    }
+                }
+                
+            }
+
+            lastMouseState = mouseState;
                 
 
 

@@ -15,11 +15,14 @@ namespace Golf.Core.ModelGolf
         private Vector3 lastVelocity;
         public bool Moving { get; set; }
 
+        ObjectAnimation anim;
+
         public Ball(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, ModelRender model) : base(game, spriteBatch, graphics,model)
         {
             Velocity = Vector3.Zero;
             lastVelocity = Vector3.Zero;
             Moving = false;
+            
             LoadContent();
         }
 
@@ -46,17 +49,22 @@ namespace Golf.Core.ModelGolf
                     lastVelocity = Velocity;
                     Moving = true;
                 }
-                
+               
+
                 Velocity -= lastVelocity /100;
                 Velocity = new Vector3((float)Math.Round(Velocity.X,2), (float)Math.Round(Velocity.Y,2), (float)Math.Round(Velocity.Z,2));
-                Console.WriteLine(Velocity);
             }
             else
             {
                 Moving = false;
             }
-                
-            
+
+            anim = new ObjectAnimation(_model.Position, 
+                                       _model.Position,
+                                       _model.Rotation,
+                                       _model.Rotation+new Vector3(10,0,0), TimeSpan.FromSeconds(2), true);
+            anim.Update(gameTime.ElapsedGameTime);
+            _model.Rotation = anim.Rotation;
             /*Tester si la balle est hors du terrain*/
         }
 
