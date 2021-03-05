@@ -48,66 +48,44 @@ namespace Golf.Core.ModelGolf
 
 
             BuildBoundingSphere();
-            BuildBoundingBox();
+           Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
+           var boundingBox =UpdateBoundingBox(Model, worldTransform);
+           var isIntersect = BoundingSphere.Intersects(boundingBox); 
         }
 
-        private void BuildBoundingBox()
+        protected Microsoft.Xna.Framework.BoundingBox UpdateBoundingBox(Model model, Matrix worldTransform)
         {
-            Microsoft.Xna.Framework.BoundingBox box;
-            ModelMeshCollection.Enumerator md;
-
-            md=Model.Meshes.GetEnumerator();
-
-            ModelMeshPart mesh;
-            VertexBuffer vertex;
-
+            // Initialize minimum and maximum corners of the bounding box to max and min values
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
-            while (md.MoveNext())
+            // For each mesh of the model
+            foreach (ModelMesh mesh in model.Meshes)
             {
-                var meshPart = md.Current.MeshParts[0];
-                // Vertex buffer parameters
-                int vertexStride = meshPart.VertexBuffer.VertexDeclaration.VertexStride;
-                int vertexBufferSize = meshPart.NumVertices * vertexStride;
-
-                // Get vertex data as float
-                float[] vertexData = new float[vertexBufferSize / sizeof(float)];
-                meshPart.VertexBuffer.GetData<float>(vertexData);
-
-                // Iterate through vertices (possibly) growing bounding box, all calculations are done in world space
-                for (int i = 0; i < vertexBufferSize / sizeof(float); i += vertexStride / sizeof(float))
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
                 {
-                    Vector3 transformedPosition = new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]);
+                    // Vertex buffer parameters
+                    int vertexStride = meshPart.VertexBuffer.VertexDeclaration.VertexStride;
+                    int vertexBufferSize = meshPart.NumVertices * vertexStride;
 
-                    min = Vector3.Min(min, transformedPosition);
-                    max = Vector3.Max(max, transformedPosition);
-                }
-                /*
-                if (md.Current.Name.Contains("plantTest"))
-                {
-                    mesh = md.Current.MeshParts[0];
-                    float[] tab = new float[mesh.VertexBuffer.VertexCount];
-                   
-                    vertex = mesh.VertexBuffer;
-                    vertex.GetData(tab);
-                    box = new BoundingBox(new Vector3(tab[0], tab[1], tab[2]), new Vector3(tab[0], tab[1], tab[2]));
-                    boundingBoxes.Add(box);
-                }
+                    // Get vertex data as float
+                    float[] vertexData = new float[vertexBufferSize / sizeof(float)];
+                    meshPart.VertexBuffer.GetData<float>(vertexData);
 
-                if (md.Current.Name.Contains("arrive"))
-                {
-                    float[] tab = new float[] { };
-                    mesh = md.Current.MeshParts[0];
-                    vertex = mesh.VertexBuffer;
-                    vertex.GetData(tab);
-                    arrive = new BoundingSphere(new Vector3(tab[0], tab[1], tab[2]), tab[3]);
+                    // Iterate through vertices (possibly) growing bounding box, all calculations are done in world space
+                    for (int i = 0; i < vertexBufferSize / sizeof(float); i += vertexStride / sizeof(float))
+                    {
+                        Vector3 transformedPosition = Vector3.Transform(new Vector3(vertexData[i], vertexData[i + 1], vertexData[i + 2]), worldTransform);
+
+                        min = Vector3.Min(min, transformedPosition);
+                        max = Vector3.Max(max, transformedPosition);
+                    }
                 }
-                */
             }
 
+            // Create and return bounding box
+            return new Microsoft.Xna.Framework.BoundingBox(min, max);
         }
-
         private void BuildBoundingSphere()
         {
             BoundingSphere sphere = new BoundingSphere(Vector3.Zero, 0);
@@ -151,7 +129,7 @@ namespace Golf.Core.ModelGolf
 
                 mesh.Draw();
             }
-            
+
         }
     }
 }
