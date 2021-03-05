@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf.Cam
 {
-    public abstract class Camera
+    public abstract class Camera : ICameraService
     {
         Matrix view;
         Matrix projection;
@@ -60,7 +60,7 @@ namespace Golf.Core.ModelGolf.Cam
             return (Frustum.Contains(sphere) != ContainmentType.Disjoint);
         }
 
-        public bool BoundingVolumeIsInView(BoundingBox box)
+        public bool BoundingVolumeIsInView(Microsoft.Xna.Framework.BoundingBox box)
         {
             return (Frustum.Contains(box) != ContainmentType.Disjoint);
         }

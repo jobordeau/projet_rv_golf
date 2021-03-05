@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Golf.Core.ModelGolf.Cam;
 
 namespace Golf.Core.ModelGolf
 {
-    public class ModelRender
+    public class ModelRender : DrawableGameComponent
     {
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
@@ -19,7 +20,7 @@ namespace Golf.Core.ModelGolf
         private BoundingSphere boundingSphere;
         private BoundingSphere arrive;
 
-        private List<BoundingBox> boundingBoxes = new List<BoundingBox>();
+        private List<Microsoft.Xna.Framework.BoundingBox> boundingBoxes = new List<Microsoft.Xna.Framework.BoundingBox>();
         public BoundingSphere BoundingSphere
         {
             get
@@ -33,7 +34,8 @@ namespace Golf.Core.ModelGolf
                 return transformed;
             }
         }
-        public ModelRender(Model Model, Vector3 Position, Vector3 Rotation, Vector3 Scale)
+        public ModelRender(Model Model, Vector3 Position, Vector3 Rotation, Vector3 Scale, Game game)
+        :base(game)
         {
             this.Model = Model;
 
@@ -51,7 +53,7 @@ namespace Golf.Core.ModelGolf
 
         private void BuildBoundingBox()
         {
-            BoundingBox box;
+            Microsoft.Xna.Framework.BoundingBox box;
             ModelMeshCollection.Enumerator md;
 
             md=Model.Meshes.GetEnumerator();
@@ -126,8 +128,10 @@ namespace Golf.Core.ModelGolf
 
         public void Draw(Matrix View, Matrix Projection)
         {
+            
             // Calculate the base transformation by combining
             // translation, rotation, and scaling
+            
             Matrix baseWorld = Matrix.CreateScale(Scale) * Matrix.CreateFromYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) * Matrix.CreateTranslation(Position);
 
             foreach (ModelMesh mesh in Model.Meshes)
@@ -147,6 +151,7 @@ namespace Golf.Core.ModelGolf
 
                 mesh.Draw();
             }
+            
         }
     }
 }

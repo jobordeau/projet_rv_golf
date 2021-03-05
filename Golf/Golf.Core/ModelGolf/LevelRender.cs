@@ -11,15 +11,15 @@ namespace Golf.Core.ModelGolf
 
         public Model Model { get; private set; }
         private Matrix[] modelTransforms;
-        private BoundingBox boundingBox;
-        public BoundingBox BoundingBox
+        private Microsoft.Xna.Framework.BoundingBox boundingBox;
+        public Microsoft.Xna.Framework.BoundingBox BoundingBox
         {
             get
             {
                 // No need for rotation, as this is a sphere
                 Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
 
-                BoundingBox transformed = boundingBox;
+                Microsoft.Xna.Framework.BoundingBox transformed = boundingBox;
 
                 return transformed;
             }

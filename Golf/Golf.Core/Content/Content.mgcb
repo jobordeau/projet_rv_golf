@@ -32,6 +32,13 @@
 /processorParam:TextureFormat=Compressed
 /build:ball_red.fbx
 
+#begin Fonts/Hud.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Hud.spritefont
+
 #begin StageTest.fbx
 /importer:FbxImporter
 /processor:ModelProcessor

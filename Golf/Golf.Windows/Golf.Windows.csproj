@@ -124,6 +124,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Apos.Gui">
+      <Version>0.16.2</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.11</Version>
     </PackageReference>
@@ -144,7 +147,7 @@
   <ItemGroup>
     <MonoGameContentReference Include="..\Golf.Core\Content\Content.mgcb">
       <Link>Content\Content.mgcb</Link>
-    </MonoGameContentReference> 
+    </MonoGameContentReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Golf.Core.ModelGolf.BoundingBox;
+using Golf.Core.ModelGolf.Cam;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -38,6 +40,9 @@ namespace Golf.Core
                          new Vector3(0f, 1f, 0f));// Y up
             worldMatrix = Matrix.CreateWorld(camTarget, Vector3.
                           Forward, Vector3.Up);
+
+           
+
         }
         protected override void LoadContent()
         {

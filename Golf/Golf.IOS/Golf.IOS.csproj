@@ -123,6 +123,9 @@
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Apos.Gui">
+      <Version>0.16.2</Version>
+    </PackageReference>
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Framework.iOS" Version="3.8.0.1641" />
   </ItemGroup>

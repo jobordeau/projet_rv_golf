@@ -23,11 +23,11 @@ namespace Golf.Core.ModelGolf
         public abstract void HandleModelCollision(GameObject otherModel);
         public abstract void Draw(GameTime gameTime, Camera camera);
 
-        public List<BoundingBox> GetBounds()
+        public List<Microsoft.Xna.Framework.BoundingBox> GetBounds()
         {
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-            List<BoundingBox> boxes = new List<BoundingBox>();
+            List<Microsoft.Xna.Framework.BoundingBox> boxes = new List<Microsoft.Xna.Framework.BoundingBox>();
 
             foreach (ModelMesh mesh in this._model.Model.Meshes.Where(elt => elt.Name.Contains("plant")))
             {
@@ -38,26 +38,26 @@ namespace Golf.Core.ModelGolf
             return boxes;
         }
 
-        private static BoundingBox CreateBoundingBox(Model model, ModelMesh mesh)
+        private static Microsoft.Xna.Framework.BoundingBox CreateBoundingBox(Model model, ModelMesh mesh)
         {
 
             Matrix[] boneTransforms = new Matrix[model.Bones.Count];
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
-            BoundingBox result = new BoundingBox();
+            Microsoft.Xna.Framework.BoundingBox result = new Microsoft.Xna.Framework.BoundingBox();
             result.Min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             result.Max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 
             foreach (ModelMeshPart meshPart in mesh.MeshParts)
             {
-                BoundingBox? meshPartBoundingBox = GetBoundingBox(meshPart, boneTransforms[mesh.ParentBone.Index]);
+                Microsoft.Xna.Framework.BoundingBox? meshPartBoundingBox = GetBoundingBox(meshPart, boneTransforms[mesh.ParentBone.Index]);
                 if (meshPartBoundingBox != null)
-                    result = BoundingBox.CreateMerged(result, meshPartBoundingBox.Value);
+                    result = Microsoft.Xna.Framework.BoundingBox.CreateMerged(result, meshPartBoundingBox.Value);
             }
-            result = new BoundingBox(result.Min, result.Max);
+            result = new Microsoft.Xna.Framework.BoundingBox(result.Min, result.Max);
             return result;
         }
-        private static BoundingBox? GetBoundingBox(ModelMeshPart meshPart, Matrix transform)
+        private static Microsoft.Xna.Framework.BoundingBox? GetBoundingBox(ModelMeshPart meshPart, Matrix transform)
         {
             if (meshPart.VertexBuffer == null)
                 return null;
@@ -73,7 +73,7 @@ namespace Golf.Core.ModelGolf
             {
                 Console.WriteLine(" " + transformedPositions[i]);
             }
-            return BoundingBox.CreateFromPoints(transformedPositions);
+            return Microsoft.Xna.Framework.BoundingBox.CreateFromPoints(transformedPositions);
         }
 
 
