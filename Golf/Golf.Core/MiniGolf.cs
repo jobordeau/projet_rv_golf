@@ -11,6 +11,7 @@ namespace Golf.Core
 {
     public class MiniGolf : Game
     {
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
