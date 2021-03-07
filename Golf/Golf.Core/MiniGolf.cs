@@ -47,10 +47,8 @@ namespace Golf.Core
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             ball = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(0, 400, 0), Vector3.Zero, new Vector3(250f),this));
-            Ball ball2 = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(200, 400, 0), Vector3.Zero, new Vector3(250f), this));
             level = new Level(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("StageTest"), Vector3.Zero, Vector3.Zero, new Vector3(50f), this));
             modelManager.AddModel(ball);
-            modelManager.AddModel(ball2);
             modelManager.AddModel(level);
             
             
@@ -126,10 +124,9 @@ namespace Golf.Core
         // Called when the game should update itself
         protected override void Update(GameTime gameTime)
         {
-            
-            
             modelManager.Update(gameTime);
             modelManager.HandleModelCollision(modelManager.elements[0]);
+            modelManager.HandleModelCollision(modelManager.elements[1]);
             updateModel(gameTime);
             camera.Update(ball);
             base.Update(gameTime);

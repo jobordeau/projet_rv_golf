@@ -2,13 +2,14 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Golf.Core.ModelGolf
 {
     
-    public class ModelManager
+    public class ModelManager 
     {
         public List<GameObject> elements;
         public ModelManager()
@@ -51,5 +52,9 @@ namespace Golf.Core.ModelGolf
         }
 
 
+        public IEnumerator GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

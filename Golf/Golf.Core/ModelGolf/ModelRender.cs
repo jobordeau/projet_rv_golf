@@ -20,7 +20,7 @@ namespace Golf.Core.ModelGolf
         private BoundingSphere boundingSphere;
         private BoundingSphere arrive;
 
-        private List<Microsoft.Xna.Framework.BoundingBox> boundingBoxes = new List<Microsoft.Xna.Framework.BoundingBox>();
+        public List<Microsoft.Xna.Framework.BoundingBox> BoundingBoxes;
         public BoundingSphere BoundingSphere
         {
             get

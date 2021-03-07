@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Text;
 
@@ -13,11 +14,12 @@ namespace Golf.Core.ModelGolf
         private string _nom { get; set; }
         private int par { get; set; }
 
+        private List<Microsoft.Xna.Framework.BoundingBox> boundingBoxes;
+
 
         public Level(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, ModelRender model) : base(game, spriteBatch, graphics, model)
         {
             LoadContent();
-            GetBounds();
         }
 
         protected override void LoadContent()
@@ -39,7 +41,19 @@ namespace Golf.Core.ModelGolf
 
         public override void HandleModelCollision(GameObject otherModel)
         {
-            
+            if (otherModel is Ball)
+            {
+                Ball otherBall = (Ball)otherModel;
+                foreach (var box in _model.BoundingBoxes)
+                {
+                    if (box.Intersects(otherBall._model.BoundingSphere))
+                    {
+                        
+                    }
+                }
+               
+            }
+
         }
 
 
