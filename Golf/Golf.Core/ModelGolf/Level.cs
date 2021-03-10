@@ -14,9 +14,6 @@ namespace Golf.Core.ModelGolf
         private string _nom { get; set; }
         private int par { get; set; }
 
-        private List<Microsoft.Xna.Framework.BoundingBox> boundingBoxes;
-
-
         public Level(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, ModelRender model) : base(game, spriteBatch, graphics, model)
         {
             LoadContent();
@@ -48,7 +45,6 @@ namespace Golf.Core.ModelGolf
                 {
                     if (box.Intersects(otherBall._model.BoundingSphere))
                     {
-                        
                     }
                 }
                

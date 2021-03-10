@@ -46,8 +46,8 @@ namespace Golf.Core
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
-            ball = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(0, 400, 0), Vector3.Zero, new Vector3(250f),this));
-            level = new Level(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("StageTest"), Vector3.Zero, Vector3.Zero, new Vector3(50f), this));
+            ball = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(0, 250, 0), Vector3.Zero, new Vector3(50f),this));
+            level = new Level(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("StageTest"), Vector3.Zero,Vector3.Zero, new Vector3(50f), this));
             modelManager.AddModel(ball);
             modelManager.AddModel(level);
             

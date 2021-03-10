@@ -20,6 +20,16 @@ namespace Golf.Core.ModelGolf
         private BoundingSphere boundingSphere;
         private BoundingSphere arrive;
 
+        public Microsoft.Xna.Framework.BoundingBox BoundingBox
+        {
+            get
+            {
+                // No need for rotation, as this is a sphere
+                Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
+                return UpdateBoundingBox(Model, worldTransform); ;
+            }
+        }
+
         public List<Microsoft.Xna.Framework.BoundingBox> BoundingBoxes;
         public BoundingSphere BoundingSphere
         {
@@ -46,11 +56,10 @@ namespace Golf.Core.ModelGolf
             this.Rotation = Rotation;
             this.Scale = Scale;
 
-
             BuildBoundingSphere();
-           Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
-           var boundingBox =UpdateBoundingBox(Model, worldTransform);
-           var isIntersect = BoundingSphere.Intersects(boundingBox); 
+            Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
+            var boundingBox = UpdateBoundingBox(Model, worldTransform);
+            var isIntersect = BoundingSphere.Intersects(boundingBox); 
         }
 
         protected Microsoft.Xna.Framework.BoundingBox UpdateBoundingBox(Model model, Matrix worldTransform)

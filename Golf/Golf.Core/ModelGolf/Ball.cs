@@ -79,6 +79,19 @@ namespace Golf.Core.ModelGolf
                     
                 }
             }
+
+            if (otherModel is Level)
+            {
+                Level otherLevel = (Level) otherModel;
+                if (_model.BoundingSphere.Center.X > otherLevel._model.BoundingBox.Min.X &&
+                    _model.BoundingSphere.Center.X < otherLevel._model.BoundingBox.Max.X &&
+                    _model.BoundingSphere.Center.Z > otherLevel._model.BoundingBox.Min.Z &&
+                    _model.BoundingSphere.Center.Z < otherLevel._model.BoundingBox.Max.Z)
+                {
+
+                }
+                
+            }
             
         }
 
