@@ -22,7 +22,7 @@ namespace Golf.Core.ModelGolf
             _model.BoundingBoxes = GetBounds();
         }
         public abstract void HandleModelCollision(GameObject otherModel);
-        public abstract void Draw(GameTime gameTime, Camera camera);
+        public abstract void Draw(GameTime gameTime, Cam.Camera camera);
 
         public List<Microsoft.Xna.Framework.BoundingBox> GetBounds()
         {

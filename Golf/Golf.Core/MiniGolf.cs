@@ -6,9 +6,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using Golf.Core.ModelGolf.BoundingBox;
-using Myra;
-using Myra.Graphics2D.UI;
 
 namespace Golf.Core
 {
@@ -17,207 +14,169 @@ namespace Golf.Core
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        List<ModelRender> models = new List<ModelRender>();
         ModelManager modelManager;
-        ChaseCamera camera;
+        
+        public BepuCamera Camera;
+
         Ball ball;
         Level level;
         private SpriteFont hudFont;
 
-        bool charge;
+        public Model Playground;
 
-        private Desktop _desktop;
+        public Model Ball;
 
-        MouseState lastMouseState;
+        private Space space;
+
+        public KeyboardState KeyboardState;
+
+        public MouseState MouseState;
 
         public MiniGolf()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            
+        }
 
-            modelManager = new ModelManager();
-            
+        protected override void Initialize()
+        {
+            Camera = new BepuCamera(this, new BEPUutilities.Vector3(0, 3, 10), 5);
+
+            base.Initialize();
         }
 
         // Called when the game should load its content
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            ball = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(0, 250, 0), Vector3.Zero, new Vector3(50f),this));
-            level = new Level(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("StageTest"), Vector3.Zero,Vector3.Zero, new Vector3(50f), this));
-            modelManager.AddModel(ball);
-            modelManager.AddModel(level);
-            
-            
+            //This 1x1x1 cube model will represent the box entities in the space.
+            Ball = Content.Load<Model>("ball_red");
 
-            hudFont = Content.Load<SpriteFont>("Fonts/Hud");
+            Playground = Content.Load<Model>("Stage");
+
+            //Construct a new space for the physics simulation to occur within.
+            space = new Space();
+
+            //Set the gravity of the simulation by accessing the simulation settings of the space.
+            //It defaults to (0,0,0); this changes it to an 'earth like' gravity.
+            //Try looking around in the space's simulationSettings to familiarize yourself with the various options.
+            space.ForceUpdater.Gravity = new Vector3(0, -9.81f, 0);
 
 
-            MyraEnvironment.Game = this;
+            //Create a physical environment from a triangle mesh.
+            //First, collect the the mesh data from the model using a helper function.
+            //This special kind of vertex inherits from the TriangleMeshVertex and optionally includes
+            //friction/bounciness data.
+            //The StaticTriangleGroup requires that this special vertex type is used in lieu of a normal TriangleMeshVertex array.
+            Vector3[] vertices;
+            int[] indices;
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(Playground, out vertices, out indices);
+            //Give the mesh information to a new StaticMesh.  
+            //Give it a transformation which scoots it down below the kinematic box entity we created earlier.
+            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
 
-            var grid = new Grid
+            //Add it to the space!
+            space.Add(mesh);
+            //Make it visible too.
+            Components.Add(new StaticModel(Playground, mesh.WorldTransform.Matrix, this));
+
+            Sphere sphere = new Sphere(new Vector3(0f, -40f, 0f), 0.40f);
+            Matrix echelle = Matrix.CreateScale(1f,1f,1f);
+            EntityModel balle = new EntityModel(sphere, Ball, echelle, this);
+            Components.Add(balle);
+
+            //Hook an event handler to an entity to handle some game logic.
+            //Refer to the Entity Events documentation for more information.
+            Box deleterBox = new Box(new Vector3(5, -6, 0), 3, 3, 3);
+            space.Add(deleterBox);
+            deleterBox.CollisionInformation.Events.InitialCollisionDetected += HandleCollision;
+
+
+            //Go through the list of entities in the space and create a graphical representation for them.
+            foreach (Entity e in space.Entities)
             {
-                RowSpacing = 8,
-                ColumnSpacing = 8
-            };
+                Box box = e as Box;
+                if (box != null) //This won't create any graphics for an entity that isn't a box since the model being used is a box.
+                {
 
-            grid.ColumnsProportions.Add(new Proportion(ProportionType.Auto));
-            grid.ColumnsProportions.Add(new Proportion(ProportionType.Auto));
-            grid.RowsProportions.Add(new Proportion(ProportionType.Auto));
-            grid.RowsProportions.Add(new Proportion(ProportionType.Auto));
+                    Matrix scaling = Matrix.CreateScale(box.Width, box.Height, box.Length); //Since the cube model is 1x1x1, it needs to be scaled to match the size of each individual box.
+                    EntityModel model = new EntityModel(e, Ball, scaling, this);
+                    //Add the drawable game component for this entity to the game.
+                    Components.Add(model);
+                    e.Tag = model; //set the object tag of this entity to the model so that it's easy to delete the graphics component later if the entity is removed.
+                }
+            }
 
-            var helloWorld = new Label
+
+        }
+
+        /// <summary>
+        /// Used to handle a collision event triggered by an entity specified above.
+        /// </summary>
+        /// <param name="sender">Entity that had an event hooked.</param>
+        /// <param name="other">Entity causing the event to be triggered.</param>
+        /// <param name="pair">Collision pair between the two objects in the event.</param>
+        void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
+        {
+            //This type of event can occur when an entity hits any other object which can be collided with.
+            //They aren't always entities; for example, hitting a StaticMesh would trigger this.
+            //Entities use EntityCollidables as collision proxies; see if the thing we hit is one.
+            var otherEntityInformation = other as EntityCollidable;
+            if (otherEntityInformation != null)
             {
-                Id = "label",
-                Text = "Hello, World!"
-            };
-            grid.Widgets.Add(helloWorld);
-
-            // ComboBox
-            var combo = new ComboBox
-            {
-                GridColumn = 1,
-                GridRow = 0
-            };
-
-            combo.Items.Add(new ListItem("Red", Color.Red));
-            combo.Items.Add(new ListItem("Green", Color.Green));
-            combo.Items.Add(new ListItem("Blue", Color.Blue));
-            grid.Widgets.Add(combo);
-
-            // Button
-            var button = new TextButton
-            {
-                GridColumn = 0,
-                GridRow = 1,
-                Text = "Show"
-            };
-
-            button.Click += (s, a) =>
-            {
-                var messageBox = Dialog.CreateMessageBox("Message", "Some message!");
-                messageBox.ShowModal(_desktop);
-            };
-
-            grid.Widgets.Add(button);
-
-            // Spin button
-            var spinButton = new SpinButton
-            {
-                GridColumn = 1,
-                GridRow = 1,
-                Width = 100,
-                Nullable = true
-            };
-            grid.Widgets.Add(spinButton);
-
-            // Add it to the desktop
-            _desktop = new Desktop();
-            _desktop.Root = grid;
-
-            
+                //We hit an entity! remove it.
+                space.Remove(otherEntityInformation.Entity);
+                //Remove the graphics too.
+                Components.Remove((EntityModel)otherEntityInformation.Entity.Tag);
+            }
         }
 
         // Called when the game should update itself
         protected override void Update(GameTime gameTime)
         {
-            modelManager.Update(gameTime);
-            modelManager.HandleModelCollision(modelManager.elements[0]);
-            modelManager.HandleModelCollision(modelManager.elements[1]);
-            updateModel(gameTime);
-            camera.Update(ball);
+            KeyboardState = Keyboard.GetState();
+            MouseState = Mouse.GetState();
+            // Allows the game to exit
+            if (KeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+                return;
+            }
+            //Update the camera.
+            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            if (MouseState.LeftButton == ButtonState.Pressed)
+            {
+                //If the user is clicking, start firing some boxes.
+                //First, create a new dynamic box at the camera's location.
+                Box toAdd = new Box(Camera.Position, 1, 1, 1, 1);
+                //Set the velocity of the new box to fly in the direction the camera is pointing.
+                //Entities have a whole bunch of properties that can be read from and written to.
+                //Try looking around in the entity's available properties to get an idea of what is available.
+                toAdd.LinearVelocity = Camera.WorldMatrix.Forward * 10;
+                //Add the new box to the simulation.
+                space.Add(toAdd);
+
+                //Add a graphical representation of the box to the drawable game components.
+                EntityModel model = new EntityModel(toAdd, Ball, Matrix.Identity, this);
+                Components.Add(model);
+                toAdd.Tag = model;  //set the object tag of this entity to the model so that it's easy to delete the graphics component later if the entity is removed.
+            }
+
+            //Steps the simulation forward one time step.
+            space.Update();
+
             base.Update(gameTime);
         }
-
-        
-
-        void updateModel(GameTime gameTime)
-        {
-            // Get the new keyboard and mouse state
-
-            
-
-            KeyboardState keyState = Keyboard.GetState();
-            Vector3 rotChange = new Vector3(0, 0, 0);
-            // Determine on which axes the ship should be rotated on, if any
-            if (keyState.IsKeyDown(Keys.Q))
-                rotChange += new Vector3(0, 1, 0);
-            if (keyState.IsKeyDown(Keys.D))
-                rotChange += new Vector3(0, -1, 0);
-            modelManager.elements[0]._model.Rotation += rotChange * .025f;
-            // Determine what direction to move in
-            Matrix rotation = Matrix.CreateFromYawPitchRoll(modelManager.elements[0]._model.Rotation.Y, modelManager.elements[0]._model.Rotation.X, modelManager.elements[0]._model.Rotation.Z);
-            // If space isn't down, the ship shouldn't move
-            MouseState mouseState = Mouse.GetState();
-
-            Ball ball = (Ball)modelManager.elements[0];
-            if (mouseState.LeftButton == ButtonState.Pressed && ball.Moving == false)
-            {
-                ball.Velocity = Vector3.Transform(Vector3.Forward, rotation) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * 4;
-                ball.Velocity = Vector3.Round(ball.Velocity);
-            }
-                
-
-
-
-        }
-
 
 
         // Called when the game should draw itself
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
-
-            modelManager.Draw(gameTime, camera);
-
-            
-            
-            //GraphicsDevice.Clear(Color.Black);
-            // _desktop.Render();
-            
-            //DrawHud();
-
+            GraphicsDevice.Clear(Color.CornflowerBlue);
             base.Draw(gameTime);
-
-           
         }
 
-        private void DrawHud()
-        {
-            Rectangle titleSafeArea = GraphicsDevice.Viewport.TitleSafeArea;
-            Vector2 hudLocation = new Vector2(titleSafeArea.X, titleSafeArea.Y);
-            Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
-                                       titleSafeArea.Y + titleSafeArea.Height / 2.0f);
 
-
-
-
-            string timeString = "Position " + ball._model.Position.ToString();
-            Color timeColor = Color.Black;
-            
-            DrawShadowedString(hudFont, timeString, hudLocation, timeColor);
-
-        }
-
-        private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)
-        {
-            spriteBatch.Begin();
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
-            spriteBatch.DrawString(font, value, position, color);
-            spriteBatch.End();
-        }
-
-        protected override void Initialize()
-        {
-            camera = new ChaseCamera(new Vector3(0, 400, 1500), new Vector3(0, 200, 0), new Vector3(0, 0, 0), GraphicsDevice);
-            Services.AddService(typeof(ICameraService), camera);
-            //Components.Add(new ModelComponent(this, "ball_red"));
-            Components.Add(new BoundingBoxComponent(this, "StageTest"));
-            base.Initialize();
-        }
     }
 }

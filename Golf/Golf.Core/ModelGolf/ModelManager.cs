@@ -34,7 +34,7 @@ namespace Golf.Core.ModelGolf
         }
 
 
-        public void Draw(GameTime gameTime, Camera camera)
+        public void Draw(GameTime gameTime, Cam.Camera camera)
         {
             foreach (GameObject element in elements)
             {

@@ -24,7 +24,7 @@ namespace Golf.Core.ModelGolf
             base.LoadContent();
         }
 
-        public override void Draw(GameTime gameTime, Camera camera)
+        public override void Draw(GameTime gameTime, Cam.Camera camera)
         {
             if (camera.BoundingVolumeIsInView(_model.BoundingSphere))
                 _model.Draw(camera.View, camera.Projection);
