@@ -1,128 +1,150 @@
-﻿using Golf.Core.ModelGolf;
+﻿using System;
+using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Entities;
+using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysicsDemos;
+using BEPUutilities;
+using Golf.Core.ModelGolf;
 using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
+using Matrix = BEPUutilities.Matrix;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
 {
-    public class MiniGolf : Game
+    public class MiniGolf: Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        List<ModelRender> models = new List<ModelRender>();
-        ModelManager modelManager;
-        ChaseCamera camera;
-        Ball ball;
-        Level level;
+        Space space;
+        Model level;
+        private Model ball;
+        private Vector3[] vertices;
+        private int[] indices;
+        public KeyboardState KeyboardState;
+        public MouseState MouseState;
 
-        Vector3 charge=Vector3.Zero;
-        Vector3 chargeMax = new Vector3(0, 0, -10);
-
-        MouseState lastMouseState;
+        public Camera Camera;
 
         public MiniGolf()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            modelManager = new ModelManager();
-            
         }
 
-        // Called when the game should load its content
+        protected override void Initialize()
+        {
+            Camera = new Camera(this, new Vector3(0, 3, 10), 5);
+            base.Initialize();
+        }
+
+
+
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            ball = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(0, 400, 0), Vector3.Zero, new Vector3(250f)));
-            Ball ball2 = new Ball(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("ball_red"), new Vector3(200, 400, 0), Vector3.Zero, new Vector3(250f)));
-            level = new Level(this, spriteBatch, graphics, new ModelRender(Content.Load<Model>("StageTest"), Vector3.Zero, Vector3.Zero, new Vector3(50f)));
-            modelManager.AddModel(ball);
-            modelManager.AddModel(ball2);
-            modelManager.AddModel(level);
+            //loading models
+            level = Content.Load<Model>("StageTest");
+            ball = Content.Load<Model>("ball_red");
 
+            //Creating and configuring space and adding elements
+            space = new Space();
+            space.ForceUpdater.Gravity = new Vector3(-0, -9.81f, 0);
+            space.Add(new Sphere(new Vector3(0, 4, 0), 1, 1));
+            space.Add(new Sphere(new Vector3(0, 8, 0), 1, 1));
+            space.Add(new Sphere(new Vector3(0, 12, 0), 1, 1));
 
-            camera = new ChaseCamera(new Vector3(0, 1000, 4000), new Vector3(0, 200, 0), new Vector3(0, 0, 0), GraphicsDevice);
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(level, out vertices, out indices);
+            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0,-40,0)));
+            space.Add(mesh);
+            Components.Add(new StaticModel(level, mesh.WorldTransform.Matrix, this));
+
+            //Hook an event handler to an entity to handle some game logic.
+            //Refer to the Entity Events documentation for more information.
+            //Box deleterBox = new Box(new Vector3(5, 2, 0), 3, 3, 3);
+            //space.Add(deleterBox);
+            //deleterBox.CollisionInformation.Events.InitialCollisionDetected += HandleCollision;
+
+            foreach (Entity e in space.Entities)
+            {
+                Box box = e as Box;
+                if(box != null)
+                {
+                    Matrix scaling = Matrix.CreateScale(box.Width, box.Height, box.Length);
+                    EntityModel model = new EntityModel(e, ball, scaling, this);
+                    Components.Add(model);
+
+                }
+            }
+
         }
 
-        // Called when the game should update itself
+        /// <summary>
+        /// Used to handle a collision event triggered by an entity specified above.
+        /// </summary>
+        /// <param name="sender">Entity that had an event hooked.</param>
+        /// <param name="other">Entity causing the event to be triggered.</param>
+        /// <param name="pair">Collision pair between the two objects in the event.</param>
+        void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
+        {
+            //This type of event can occur when an entity hits any other object which can be collided with.
+            //They aren't always entities; for example, hitting a StaticMesh would trigger this.
+            //Entities use EntityCollidables as collision proxies; see if the thing we hit is one.
+            var otherEntityInformation = other as EntityCollidable;
+            if (otherEntityInformation != null)
+            {
+                //We hit an entity! remove it.
+                space.Remove(otherEntityInformation.Entity);
+                //Remove the graphics too.
+                Components.Remove((EntityModel)otherEntityInformation.Entity.Tag);
+            }
+        }
+
         protected override void Update(GameTime gameTime)
         {
-            
-            
-            modelManager.Update(gameTime);
-            modelManager.HandleModelCollision(modelManager.elements[0]);
-            updateModel(gameTime);
-            camera.Update(ball);
+            KeyboardState = Keyboard.GetState();
+            MouseState = Mouse.GetState();
+
+            if (KeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+                return;
+            }
+
+            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            if(MouseState.LeftButton == ButtonState.Pressed)
+            {
+                Box toAdd = new Box(Camera.Position, 10, 10, 10, 1);
+                toAdd.LinearVelocity = Camera.WorldMatrix.Forward * 10;
+
+                space.Add(toAdd);
+
+                Matrix scaling = Matrix.CreateScale(toAdd.Width, toAdd.Height, toAdd.Length);
+                EntityModel model = new EntityModel(toAdd, ball, scaling, this);
+                Components.Add(model);
+                toAdd.Tag = model;
+            }
+
+            space.Update();
             base.Update(gameTime);
         }
 
-        
-
-        void updateModel(GameTime gameTime)
-        {
-            // Get the new keyboard and mouse state
-
-            
-
-            KeyboardState keyState = Keyboard.GetState();
-            Vector3 rotChange = new Vector3(0, 0, 0);
-            // Determine on which axes the ship should be rotated on, if any
-            if (keyState.IsKeyDown(Keys.Q))
-                rotChange += new Vector3(0, 1, 0);
-            if (keyState.IsKeyDown(Keys.D))
-                rotChange += new Vector3(0, -1, 0);
-            modelManager.elements[0]._model.TargetRotation += rotChange * .025f;
-            // Determine what direction to move in
-            Matrix rotation = Matrix.CreateFromYawPitchRoll(modelManager.elements[0]._model.TargetRotation.Y, modelManager.elements[0]._model.TargetRotation.X, modelManager.elements[0]._model.TargetRotation.Z);
-            // If space isn't down, the ship shouldn't move
-            MouseState mouseState = Mouse.GetState();
-
-            Ball ball = (Ball)modelManager.elements[0];
-            if (mouseState.LeftButton == ButtonState.Released && ball.Moving == false)
-            {
-                if(lastMouseState.LeftButton == ButtonState.Pressed)
-                {
-                    ball.Velocity = Vector3.Transform(charge, rotation) * (float)gameTime.ElapsedGameTime.TotalMilliseconds * 4;
-                    ball.Velocity = Vector3.Round(ball.Velocity);
-                    charge = Vector3.Zero;
-                }
-                
-            }
-
-            if(mouseState.LeftButton == ButtonState.Pressed)
-            {
-                if (!ball.Moving)
-                {
-                    if (!charge.Equals(chargeMax))
-                    {
-                        charge += new Vector3(0, 0, -0.2f);
-                    }
-                }
-                
-            }
-
-            lastMouseState = mouseState;
-                
-
-
-
-        }
-
-
-
-        // Called when the game should draw itself
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            modelManager.Draw(gameTime, camera);
-
+            GraphicsDevice.Clear(Color.LightSkyBlue);
             base.Draw(gameTime);
+
+            
         }
     }
 }

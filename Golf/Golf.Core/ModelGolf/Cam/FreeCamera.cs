@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf.Cam
 {
-    public class FreeCamera : Camera
+    /*public class FreeCamera 
     {
         public float Yaw { get; set; }
         public float Pitch { get; set; }
@@ -57,4 +57,5 @@ namespace Golf.Core.ModelGolf.Cam
             View = Matrix.CreateLookAt(Position, Target, up);
         }
     }
+    */
 }

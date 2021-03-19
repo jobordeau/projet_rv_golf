@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf.Cam
 {
-    public class ChaseCamera : Camera
+    /*public class ChaseCamera : Camera
     {
         public Vector3 Position { get; private set; }
         public Vector3 Target { get; private set; }
@@ -75,7 +75,7 @@ namespace Golf.Core.ModelGolf.Cam
             // Recalculate the view matrix
             View = Matrix.CreateLookAt(Position, Target, up);
         }
-    }
+    }*/
 
 
 

@@ -25,11 +25,11 @@ namespace Golf.Core.ModelGolf
             base.LoadContent();
         }
 
-        public override void Draw(GameTime gameTime, Camera camera)
+        /*public override void Draw(GameTime gameTime, Camera camera)
         {
             if (camera.BoundingVolumeIsInView(_model.BoundingSphere))
                 _model.Draw(camera.View, camera.Projection);
-        }
+        }*/
 
         public override void Update(GameTime gameTime)
         {

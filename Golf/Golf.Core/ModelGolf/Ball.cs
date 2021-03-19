@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf
 {
-    public class Ball : GameObject
+    /*public class Ball : GameObject
     {
         
         public Vector3 Velocity { get; set; }
@@ -67,8 +67,8 @@ namespace Golf.Core.ModelGolf
             anim.Update(gameTime.ElapsedGameTime);
             _model.Rotation = anim.Rotation;
             /*Tester si la balle est hors du terrain*/
-        }
-
+        /*}
+        
         public override void HandleModelCollision(GameObject otherModel)
         {
             if(otherModel is Ball)
@@ -90,6 +90,6 @@ namespace Golf.Core.ModelGolf
             
         }
 
-    }
+    }*/
 
 }
