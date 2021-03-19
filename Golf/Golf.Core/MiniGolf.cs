@@ -6,6 +6,17 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.Entities;
+using BEPUphysics.Entities.Prefabs;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUutilities;
+using GettingStartedDemo;
+using Golf.Core.ModelGolf.Camera;
+using Matrix = BEPUutilities.Matrix;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
 {
