@@ -2,6 +2,7 @@
 using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.CollisionTests;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
@@ -12,6 +13,7 @@ using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using BoundingBox = BEPUutilities.BoundingBox;
 using MathHelper = BEPUutilities.MathHelper;
 using Matrix = BEPUutilities.Matrix;
 using Vector3 = BEPUutilities.Vector3;
@@ -25,7 +27,9 @@ namespace Golf.Core
 
         Space space;
         Model level;
+        private Model arrive;
         private Model ball;
+        private BoundingBox boundingArrive;
         private Vector3[] vertices;
         private int[] indices;
         public KeyboardState KeyboardState;
@@ -52,6 +56,7 @@ namespace Golf.Core
             //loading models
             level = Content.Load<Model>("StageTest");
             ball = Content.Load<Model>("ball_red");
+            arrive = Content.Load<Model>("arrive");
 
             //Creating and configuring space and adding elements
             space = new Space();
@@ -64,18 +69,19 @@ namespace Golf.Core
             space.Add(mesh);
             Components.Add(new StaticModel(level, mesh.WorldTransform.Matrix, this));
 
-            //Hook an event handler to an entity to handle some game logic.
-            //Refer to the Entity Events documentation for more information.
-            //Box deleterBox = new Box(new Vector3(5, 2, 0), 3, 3, 3);
-            //space.Add(deleterBox);
-            //deleterBox.CollisionInformation.Events.InitialCollisionDetected += HandleCollision;
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(arrive,out vertices,out indices);
+            var mesh2 = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
+            space.Add(mesh2);
+            boundingArrive = mesh2.BoundingBox;
+            Components.Add(new StaticModel(arrive, mesh2.WorldTransform.Matrix, this));
+
 
             foreach (Entity e in space.Entities)
             {
-                Sphere box = e as Sphere;
-                if(box != null)
+                Sphere sphere = e as Sphere;
+                if(sphere != null)
                 {
-                    Matrix scaling = Matrix.CreateScale(box.Radius, box.Radius, box.Radius);
+                    Matrix scaling = Matrix.CreateScale(sphere.Radius, sphere.Radius, sphere.Radius);
                     EntityModel model = new EntityModel(e, ball, scaling, this);
                     Components.Add(model);
 
@@ -125,8 +131,20 @@ namespace Golf.Core
 
             if(MouseState.LeftButton == ButtonState.Pressed)
             {
-                
+                space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection;
             }
+
+            if (boundingArrive.Intersects(space.Entities[0].CollisionInformation.BoundingBox))
+            {
+                Exit();
+                return;
+            }
+
+            if (space.Entities[0].Position.Y < -50f)
+            {
+                space.Entities[0].Position = new Vector3(0, 0, 0);
+            }
+            
 
             space.Update();
             base.Update(gameTime);
