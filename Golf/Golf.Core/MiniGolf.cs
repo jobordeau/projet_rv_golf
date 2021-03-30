@@ -12,6 +12,7 @@ using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using MathHelper = BEPUutilities.MathHelper;
 using Matrix = BEPUutilities.Matrix;
 using Vector3 = BEPUutilities.Vector3;
 
@@ -30,7 +31,8 @@ namespace Golf.Core
         public KeyboardState KeyboardState;
         public MouseState MouseState;
 
-        public Camera Camera;
+        public ChaseCameraControlScheme Camera;
+        public Camera CameraClassic;
 
         public MiniGolf()
         {
@@ -40,7 +42,6 @@ namespace Golf.Core
 
         protected override void Initialize()
         {
-            Camera = new Camera(this, new Vector3(0, 3, 10), 5);
             base.Initialize();
         }
 
@@ -55,9 +56,8 @@ namespace Golf.Core
             //Creating and configuring space and adding elements
             space = new Space();
             space.ForceUpdater.Gravity = new Vector3(-0, -9.81f, 0);
-            space.Add(new Sphere(new Vector3(0, 4, 0), 1, 1));
-            space.Add(new Sphere(new Vector3(0, 8, 0), 1, 1));
-            space.Add(new Sphere(new Vector3(0, 12, 0), 1, 1));
+            Sphere Balle = new Sphere(new Vector3(0, 0, 0), 1, 1);
+            space.Add(Balle);
 
             ModelDataExtractor.GetVerticesAndIndicesFromModel(level, out vertices, out indices);
             var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0,-40,0)));
@@ -72,16 +72,21 @@ namespace Golf.Core
 
             foreach (Entity e in space.Entities)
             {
-                Box box = e as Box;
+                Sphere box = e as Sphere;
                 if(box != null)
                 {
-                    Matrix scaling = Matrix.CreateScale(box.Width, box.Height, box.Length);
+                    Matrix scaling = Matrix.CreateScale(box.Radius, box.Radius, box.Radius);
                     EntityModel model = new EntityModel(e, ball, scaling, this);
                     Components.Add(model);
 
                 }
             }
 
+            
+            CameraClassic = new Camera(BEPUutilities.Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
+
+            Camera = new ChaseCameraControlScheme(space.Entities[0], new Vector3(0, 7, 0), false,50f, CameraClassic,this);
+            //Camera = new FreeCameraControlScheme(10,CameraClassic,this);
         }
 
         /// <summary>
@@ -110,25 +115,17 @@ namespace Golf.Core
             KeyboardState = Keyboard.GetState();
             MouseState = Mouse.GetState();
 
+            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
             if (KeyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
                 return;
             }
 
-            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
             if(MouseState.LeftButton == ButtonState.Pressed)
             {
-                Box toAdd = new Box(Camera.Position, 10, 10, 10, 1);
-                toAdd.LinearVelocity = Camera.WorldMatrix.Forward * 10;
-
-                space.Add(toAdd);
-
-                Matrix scaling = Matrix.CreateScale(toAdd.Width, toAdd.Height, toAdd.Length);
-                EntityModel model = new EntityModel(toAdd, ball, scaling, this);
-                Components.Add(model);
-                toAdd.Tag = model;
+                
             }
 
             space.Update();
@@ -143,8 +140,6 @@ namespace Golf.Core
         {
             GraphicsDevice.Clear(Color.LightSkyBlue);
             base.Draw(gameTime);
-
-            
         }
     }
 }

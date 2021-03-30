@@ -65,8 +65,8 @@ namespace Golf.Core.ModelGolf
                 foreach (BasicEffect effect in mesh.Effects)
                 {
                     effect.World = boneTransforms[mesh.ParentBone.Index] * worldMatrix;
-                    effect.View = MathConverter.Convert((Game as MiniGolf).Camera.ViewMatrix);
-                    effect.Projection = MathConverter.Convert((Game as MiniGolf).Camera.ProjectionMatrix);
+                    effect.View = MathConverter.Convert((Game as MiniGolf).CameraClassic.ViewMatrix);
+                    effect.Projection = MathConverter.Convert((Game as MiniGolf).CameraClassic.ProjectionMatrix);
                 }
                 mesh.Draw();
             }
