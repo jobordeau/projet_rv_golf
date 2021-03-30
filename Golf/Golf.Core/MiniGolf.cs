@@ -18,7 +18,7 @@ using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
 {
-    public class MiniGolf: Game
+    public class MiniGolf : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -31,6 +31,7 @@ namespace Golf.Core
         public KeyboardState KeyboardState;
         public MouseState MouseState;
 
+        public GameManager manager;
         public ChaseCameraControlScheme Camera;
         public Camera CameraClassic;
 
@@ -49,44 +50,12 @@ namespace Golf.Core
 
         protected override void LoadContent()
         {
-            //loading models
-            level = Content.Load<Model>("StageTest");
-            ball = Content.Load<Model>("ball_red");
-
-            //Creating and configuring space and adding elements
-            space = new Space();
-            space.ForceUpdater.Gravity = new Vector3(-0, -9.81f, 0);
-            Sphere Balle = new Sphere(new Vector3(0, 0, 0), 1, 1);
-            space.Add(Balle);
-
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(level, out vertices, out indices);
-            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0,-40,0)));
-            space.Add(mesh);
-            Components.Add(new StaticModel(level, mesh.WorldTransform.Matrix, this));
-
-            //Hook an event handler to an entity to handle some game logic.
-            //Refer to the Entity Events documentation for more information.
-            //Box deleterBox = new Box(new Vector3(5, 2, 0), 3, 3, 3);
-            //space.Add(deleterBox);
-            //deleterBox.CollisionInformation.Events.InitialCollisionDetected += HandleCollision;
-
-            foreach (Entity e in space.Entities)
-            {
-                Sphere box = e as Sphere;
-                if(box != null)
-                {
-                    Matrix scaling = Matrix.CreateScale(box.Radius, box.Radius, box.Radius);
-                    EntityModel model = new EntityModel(e, ball, scaling, this);
-                    Components.Add(model);
-
-                }
-            }
-
-            
-            CameraClassic = new Camera(BEPUutilities.Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
-
-            Camera = new ChaseCameraControlScheme(space.Entities[0], new Vector3(0, 7, 0), false,50f, CameraClassic,this);
-            //Camera = new FreeCameraControlScheme(10,CameraClassic,this);
+            manager = new GameManager(this);
+            manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, 0, 0)));
+            manager.LoadGame();
+            CameraClassic = new Camera(Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
+            Camera = new ChaseCameraControlScheme(manager.Space.Entities[0], new Vector3(0, 7, 0), false, 50f, CameraClassic, this);
+           
         }
 
         /// <summary>
@@ -123,12 +92,12 @@ namespace Golf.Core
                 return;
             }
 
-            if(MouseState.LeftButton == ButtonState.Pressed)
+            if (MouseState.LeftButton == ButtonState.Pressed)
             {
-                
+                manager.Space.Entities[0].LinearVelocity = new Vector3(10,0,0);
             }
 
-            space.Update();
+            manager.Space.Update();
             base.Update(gameTime);
         }
 
