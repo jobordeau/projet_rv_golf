@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using Golf.Core;
 using Golf.Core.ModelGolf.Cam;
+using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos
+namespace Golf.Core.ModelGolf.Cam
 {
     /// <summary>
     /// Superclass of implementations which control the behavior of a camera.
     /// </summary>
     public abstract class CameraControlScheme
     {
+        MouseState lastMousState;
         /// <summary>
         /// Gets the game associated with the camera.
         /// </summary>
@@ -37,13 +39,17 @@ namespace BEPUphysicsDemos
 #if XBOX360
             Yaw += Game.GamePadInput.ThumbSticks.Right.X * -1.5f * dt;
             Pitch += Game.GamePadInput.ThumbSticks.Right.Y * 1.5f * dt;
-#else
-            //Only turn if the mouse is controlled by the game.
-            if (!Game.IsMouseVisible)
+#else       
+            MouseState mouse = Game.MouseState;
+            if (!Game.IsMouseVisible && lastMousState != null)
             {
-                Camera.Yaw((200 - Game.MouseState.X) * dt * 0.01f);
-                Camera.Pitch((200 - Game.MouseState.Y) * dt * 0.01f);
+                
+                Camera.Yaw((lastMousState.X - mouse.X) * dt * 0.1f);
+                
+                
             }
+            Camera.Pitch((lastMousState.Y - mouse.Y) * dt * 0.1f);
+            lastMousState = mouse;
 #endif
         }
     }

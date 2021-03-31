@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MathHelper = BEPUutilities.MathHelper;
-using Matrix = BEPUutilities.Matrix;
+
 using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
@@ -24,10 +24,6 @@ namespace Golf.Core
         SpriteBatch spriteBatch;
 
         Space space;
-        Model level;
-        private Model ball;
-        private Vector3[] vertices;
-        private int[] indices;
         public KeyboardState KeyboardState;
         public MouseState MouseState;
 
@@ -94,7 +90,8 @@ namespace Golf.Core
 
             if (MouseState.LeftButton == ButtonState.Pressed)
             {
-                manager.Space.Entities[0].LinearVelocity = new Vector3(10,0,0);
+                manager.Space.Entities[0].LinearVelocity = Matrix3x3.Transform(new Vector3(100,0,0), Camera.Camera.rotation);
+                
             }
 
             manager.Space.Update();

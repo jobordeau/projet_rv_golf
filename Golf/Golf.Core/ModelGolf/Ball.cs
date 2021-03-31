@@ -3,6 +3,9 @@ using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector3 = BEPUutilities.Vector3;
+using Matrix = BEPUutilities.Matrix;
+using BEPUphysics;
+using System;
 
 namespace Golf.Core.ModelGolf
 {
@@ -15,8 +18,25 @@ namespace Golf.Core.ModelGolf
         {
 
             Model = game.Content.Load<Model>(modelName);
-            Form = new Sphere(position, 1, 1);
+            Form = new Sphere(position, 5, 1);
          
+        }
+
+        public void Load(Space space, MiniGolf game)
+        {
+            space.Add(Form);
+            if (Model != null)
+            {
+                Matrix scaling = Matrix.CreateScale(Form.Radius, Form.Radius, Form.Radius);
+                EntityModel model = new EntityModel(Form, Model, scaling, game);
+                game.Components.Add(model);
+
+            }
+            else
+            {
+                space.Remove(Form);
+                throw new Exception("Load on model null");
+            }
         }
 
     }

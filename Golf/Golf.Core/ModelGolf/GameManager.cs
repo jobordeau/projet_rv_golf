@@ -6,8 +6,6 @@ using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using MathHelper = BEPUutilities.MathHelper;
-using Matrix = BEPUutilities.Matrix;
 using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core.ModelGolf
@@ -18,13 +16,14 @@ namespace Golf.Core.ModelGolf
         public List<Player> Level { get; }
         public Space Space { get; }
         private MiniGolf game;
-        public ChaseCameraControlScheme Camera;
+        private int nbPlayer;
 
 
         public GameManager(MiniGolf game)
         {
             this.game = game;
             Players = new LinkedList<Player>();
+            nbPlayer = 0;
 
             //Creating and configuring space
             Space = new Space();
@@ -36,6 +35,7 @@ namespace Golf.Core.ModelGolf
        public void AddPlayer(Player player)
        {
             Players.AddLast(player);
+            nbPlayer++;
        }
 
        public void LoadGame()
@@ -48,27 +48,14 @@ namespace Golf.Core.ModelGolf
         {
             foreach(Player player in Players)
             {
-                Ball ball = player.Ball;
-                Space.Add(ball.Form);
-                if (ball.Model != null)
-                {
-                    Matrix scaling = Matrix.CreateScale(ball.Form.Radius, ball.Form.Radius, ball.Form.Radius);
-                    EntityModel model = new EntityModel(ball.Form, ball.Model, scaling, game);
-                    game.Components.Add(model);
-
-                }
+                player.Ball.Load(Space, game);
             }
 
         }
 
        private void LoadLevel(Level level)
         {
-            Vector3[] vertices;
-            int[] indices;
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(level.ModelLevel, out vertices, out indices);
-            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
-            Space.Add(mesh);
-            game.Components.Add(new StaticModel(level.ModelLevel, mesh.WorldTransform.Matrix, game));
+            level.Load(Space, game);
         }
 
     }
