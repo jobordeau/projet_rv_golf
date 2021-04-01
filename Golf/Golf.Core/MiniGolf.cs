@@ -25,19 +25,12 @@ namespace Golf.Core
 {
     public class MiniGolf : Game
     {
-
-        GraphicsDeviceManager graphics;
+        public GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        Space space;
-        Model level;
-        private Model ball;
-        private BoundingBox boundingArrive;
-        private Vector3[] vertices;
-        private int[] indices;
         public KeyboardState KeyboardState;
         public MouseState MouseState;
-
+        public MouseState LastMouseState;
         public GameManager manager;
         public ChaseCameraControlScheme Camera;
         public Camera CameraClassic;
@@ -55,6 +48,7 @@ namespace Golf.Core
 
         protected override void Initialize()
         {
+            graphics.ToggleFullScreen();
             base.Initialize();
         }
 
@@ -65,10 +59,6 @@ namespace Golf.Core
             manager = new GameManager(this);
             manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, -20, 0)));
             manager.LoadGame();
-            var model = Content.Load<Model>("arrive");
-            ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
-            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
-            boundingArrive = mesh.BoundingBox;
             CameraClassic = new Camera(Vector3.Zero, 0, 0,
                 BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4,
                     graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
@@ -88,6 +78,8 @@ namespace Golf.Core
         {
             KeyboardState = Keyboard.GetState();
             MouseState = Mouse.GetState();
+            Entity mainEntity = manager.MainPlayer.Ball.Form;
+
             if (_launched)
             {
                 Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -98,36 +90,51 @@ namespace Golf.Core
                     return;
                 }
 
-                //On peut taper uniquement quand la vitesse de la balle est basse
-                if (manager.Space.Entities[0].LinearVelocity.Length() < 50)
+                if (!manager.MainPlayer.Ball.IsMoving())
                 {
                     if (MouseState.LeftButton == ButtonState.Pressed)
                     {
-                        manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection;
+                        if (manager.Charge <= manager.CHARGE_MAX)
+                        {
+                            manager.Charge += 0.1f * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                        }
+                        if (manager.Charge >= manager.CHARGE_MAX)
+                        {
+                            manager.Charge = manager.CHARGE_MAX;
+                        }
                     }
-
-                    if (MouseState.RightButton == ButtonState.Pressed)
+                    if (LastMouseState.LeftButton == ButtonState.Pressed)
                     {
-                        manager.Space.Entities[0].LinearVelocity -= Camera.Camera.ViewDirection;
+                        if (MouseState.LeftButton == ButtonState.Released)
+                        {
+                            mainEntity.LinearVelocity += Camera.Camera.ViewDirection * manager.Charge;
+                            nbHits++;
+                        }
                     }
 
-                    nbHits++;
                 }
+                else
+                {
+                    manager.Charge = 0;
+                }
+                LastMouseState = MouseState;
 
-                if (manager.Space.Entities[0].CollisionInformation.BoundingBox.Intersects(boundingArrive))
+                if (mainEntity.CollisionInformation.BoundingBox.Intersects(manager.MainLevel.BoundingArrive))
                 {
                     Exit();
                     return;
                 }
 
-                if (manager.Space.Entities[0].Position.Y < -50f || KeyboardState.IsKeyDown(Keys.R))
+                if (mainEntity.Position.Y < -50f || KeyboardState.IsKeyDown(Keys.R))
                 {
-                    manager.Space.Entities[0].LinearVelocity = Vector3.Zero;
-                    manager.Space.Entities[0].Position = Vector3.Zero;
+                    mainEntity.LinearVelocity = Vector3.Zero;
+                    mainEntity.Position = Vector3.Zero;
                 }
 
                 manager.Space.Update();
+                base.Update(gameTime);
             }
+
 
             GuiHelper.UpdateSetup();
             _ui.UpdateAll(gameTime);

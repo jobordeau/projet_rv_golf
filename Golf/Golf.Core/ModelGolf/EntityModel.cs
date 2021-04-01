@@ -14,7 +14,7 @@ namespace Golf.Core.ModelGolf
         /// <summary>
         /// Entity that this model follows.
         /// </summary>
-        Entity entity;
+        public Entity Entity { get; }
         Model model;
         /// <summary>
         /// Base transformation to apply to the model.
@@ -33,7 +33,7 @@ namespace Golf.Core.ModelGolf
         public EntityModel(Entity entity, Model model, BEPUutilities.Matrix transform, Game game)
             : base(game)
         {
-            this.entity = entity;
+            this.Entity = entity;
             this.model = model;
             this.Transform = transform;
 
@@ -56,7 +56,7 @@ namespace Golf.Core.ModelGolf
             //and translation of the entity combined.
             //There are a variety of properties available in the entity, try looking around
             //in the list to familiarize yourself with it.
-            Matrix worldMatrix = MathConverter.Convert(Transform * entity.WorldTransform);
+            Matrix worldMatrix = MathConverter.Convert(Transform * Entity.WorldTransform);
 
 
             model.CopyAbsoluteBoneTransformsTo(boneTransforms);

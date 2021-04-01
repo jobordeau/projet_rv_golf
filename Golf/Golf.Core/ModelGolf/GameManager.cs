@@ -16,6 +16,10 @@ namespace Golf.Core.ModelGolf
         public List<Player> Level { get; }
         public Space Space { get; }
         private MiniGolf game;
+        public Level MainLevel { get; private set; }
+        public Player MainPlayer { get; private set; }
+        public float Charge { get; set; }
+        public readonly float  CHARGE_MAX;
         private int nbPlayer;
 
 
@@ -24,6 +28,8 @@ namespace Golf.Core.ModelGolf
             this.game = game;
             Players = new LinkedList<Player>();
             nbPlayer = 0;
+            Charge = 0;
+            CHARGE_MAX = 200;
 
             //Creating and configuring space
             Space = new Space();
@@ -40,11 +46,17 @@ namespace Golf.Core.ModelGolf
 
        public void LoadGame()
         {
-            LoadLevel(new Level(game, "StageTest"));
-            loadBall();
+            if (nbPlayer != 0)
+            {
+                MainPlayer = Players.First.Value;
+                MainLevel = new Level(game, "StageTest");
+                LoadLevel(MainLevel);
+                LoadBall();
+            }
+            
         }
 
-       private void loadBall()
+       private void LoadBall()
         {
             foreach(Player player in Players)
             {
