@@ -57,6 +57,10 @@ namespace Golf.Core
             manager = new GameManager(this);
             manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, 0, 0)));
             manager.LoadGame();
+            var model = Content.Load<Model>("arrive"); 
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
+            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
+            boundingArrive = mesh.BoundingBox;
             CameraClassic = new Camera(Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
             Camera = new ChaseCameraControlScheme(manager.Space.Entities[0], new Vector3(0, 7, 0), false, 50f, CameraClassic, this);
            
@@ -96,10 +100,25 @@ namespace Golf.Core
                 return;
             }
 
-            if (MouseState.LeftButton == ButtonState.Pressed)
+            if(manager.Space.Entities[0].LinearVelocity != Vector3.Zero)
             {
-                manager.Space.Entities[0].LinearVelocity = new Vector3(10,0,0);
+                if (MouseState.LeftButton == ButtonState.Pressed)
+                {
+                    manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection;
+                }
             }
+            
+
+            if (manager.Space.Entities[0].CollisionInformation.BoundingBox.Intersects(boundingArrive))
+            {
+
+            }
+
+            if (manager.Space.Entities[0].Position.Y < -50f)
+            {
+                manager.Space.Entities[0].Position = new Vector3(0, 0, 0);
+            }
+
 
             manager.Space.Update();
             base.Update(gameTime);
