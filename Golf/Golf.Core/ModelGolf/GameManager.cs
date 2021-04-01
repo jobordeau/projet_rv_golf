@@ -27,7 +27,7 @@ namespace Golf.Core.ModelGolf
 
             //Creating and configuring space
             Space = new Space();
-            Space.ForceUpdater.Gravity = new Vector3(-0, -9.81f, 0);
+            Space.ForceUpdater.Gravity = new Vector3(-0, -18f, 0);
 
         }
 

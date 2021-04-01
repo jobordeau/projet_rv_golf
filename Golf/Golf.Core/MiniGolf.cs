@@ -15,7 +15,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BoundingBox = BEPUutilities.BoundingBox;
 using MathHelper = BEPUutilities.MathHelper;
-
+using Apos;
+using Apos.Gui;
+using FontStashSharp;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
@@ -40,11 +43,14 @@ namespace Golf.Core
         public Camera CameraClassic;
         private int nbHits=0;
         private Vector3 lastPosition;
+        IMGUI _ui;
+        private bool _launched = false;
 
         public MiniGolf()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -57,79 +63,93 @@ namespace Golf.Core
         protected override void LoadContent()
         {
             manager = new GameManager(this);
-            manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, 0, 0)));
+            manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, -20, 0)));
             manager.LoadGame();
-            var model = Content.Load<Model>("arrive"); 
+            var model = Content.Load<Model>("arrive");
             ModelDataExtractor.GetVerticesAndIndicesFromModel(model, out vertices, out indices);
             var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
             boundingArrive = mesh.BoundingBox;
-            CameraClassic = new Camera(Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
-            Camera = new ChaseCameraControlScheme(manager.Space.Entities[0], new Vector3(0, 7, 0), false, 50f, CameraClassic, this);
+            CameraClassic = new Camera(Vector3.Zero, 0, 0,
+                BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4,
+                    graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
+            Camera = new ChaseCameraControlScheme(manager.Space.Entities[0], new Vector3(0, 7, 0), false, 50f, CameraClassic,
+                this);
+            
+            FontSystem fontSystem = FontSystemFactory.Create(GraphicsDevice, 2048, 2048);
+            fontSystem.AddFont(TitleContainer.OpenStream($"{Content.RootDirectory}/font-file.ttf"));
+
+            GuiHelper.Setup(this, fontSystem);
+
+            _ui = new IMGUI();
         }
 
-        /// <summary>
-        /// Used to handle a collision event triggered by an entity specified above.
-        /// </summary>
-        /// <param name="sender">Entity that had an event hooked.</param>
-        /// <param name="other">Entity causing the event to be triggered.</param>
-        /// <param name="pair">Collision pair between the two objects in the event.</param>
-        void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
-        {
-            //This type of event can occur when an entity hits any other object which can be collided with.
-            //They aren't always entities; for example, hitting a StaticMesh would trigger this.
-            //Entities use EntityCollidables as collision proxies; see if the thing we hit is one.
-            var otherEntityInformation = other as EntityCollidable;
-            if (otherEntityInformation != null)
-            {
-                //We hit an entity! remove it.
-                space.Remove(otherEntityInformation.Entity);
-                //Remove the graphics too.
-                Components.Remove((EntityModel)otherEntityInformation.Entity.Tag);
-            }
-        }
 
         protected override void Update(GameTime gameTime)
         {
             KeyboardState = Keyboard.GetState();
             MouseState = Mouse.GetState();
-
-            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
-            if (KeyboardState.IsKeyDown(Keys.Escape))
+            if (_launched)
             {
-                Exit();
-                return;
-            }
+                Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            //On peut taper uniquement quand la vitesse de la balle est basse
-            if ( manager.Space.Entities[0].LinearVelocity.Length() < 50)
-            {
-                if (MouseState.LeftButton == ButtonState.Pressed)
+                if (KeyboardState.IsKeyDown(Keys.Escape))
                 {
-                    manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection * 50;
+                    Exit();
+                    return;
                 }
 
-                if (MouseState.RightButton == ButtonState.Pressed)
+                //On peut taper uniquement quand la vitesse de la balle est basse
+                if (manager.Space.Entities[0].LinearVelocity.Length() < 50)
                 {
-                    manager.Space.Entities[0].LinearVelocity -= Camera.Camera.ViewDirection * 50;
+                    if (MouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection;
+                    }
+
+                    if (MouseState.RightButton == ButtonState.Pressed)
+                    {
+                        manager.Space.Entities[0].LinearVelocity -= Camera.Camera.ViewDirection;
+                    }
+
+                    nbHits++;
                 }
 
-                nbHits++;
+                if (manager.Space.Entities[0].CollisionInformation.BoundingBox.Intersects(boundingArrive))
+                {
+                    Exit();
+                    return;
+                }
+
+                if (manager.Space.Entities[0].Position.Y < -50f || KeyboardState.IsKeyDown(Keys.R))
+                {
+                    manager.Space.Entities[0].LinearVelocity = Vector3.Zero;
+                    manager.Space.Entities[0].Position = Vector3.Zero;
+                }
+
+                manager.Space.Update();
             }
 
-            if (manager.Space.Entities[0].CollisionInformation.BoundingBox.Intersects(boundingArrive))
+            GuiHelper.UpdateSetup();
+            _ui.UpdateAll(gameTime);
+
+            // Create your UI.
+            Panel.Push().XY = new Vector2(700,300);
+            Label.Put("MiniGolf");
+            if (Button.Put("Launch Game").Clicked)
+            {
+                IsMouseVisible = false;
+                _launched = true;
+            }
+            if (Button.Put("Quit").Clicked)
             {
                 Exit();
-                return;
             }
+            Panel.Pop();
 
-            if (manager.Space.Entities[0].Position.Y < -50f)
-            {
-                manager.Space.Entities[0].LinearVelocity = Vector3.Zero;
-                manager.Space.Entities[0].Position = Vector3.Zero;
-            }
 
-            manager.Space.Update();
+            // Call UpdateCleanup at the end.
+            GuiHelper.UpdateCleanup();
+
             base.Update(gameTime);
         }
 
@@ -140,7 +160,15 @@ namespace Golf.Core
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.LightSkyBlue);
-            base.Draw(gameTime);
+
+            if (!_launched)
+            { 
+                _ui.Draw(gameTime);
+            }
+            else
+            {
+                base.Draw(gameTime);
+            }
         }
     }
 }

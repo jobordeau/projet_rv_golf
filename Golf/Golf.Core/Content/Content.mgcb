@@ -51,6 +51,9 @@
 /processorParam:TextureFormat=Compressed
 /build:ball_red.fbx
 
+#begin font-file.ttf
+/copy:font-file.ttf
+
 #begin Sprites/background_menu.jpg
 /importer:TextureImporter
 /processor:TextureProcessor
