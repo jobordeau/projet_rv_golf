@@ -1,37 +1,61 @@
-﻿using System;
+﻿using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysicsDemos;
+using BEPUutilities;
+using Golf.Core.ModelGolf.Cam;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
-using System.Text;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core.ModelGolf
 {
     public class GameManager
     {
         public LinkedList<Player> Players { get; }
+        public List<Player> Level { get; }
+        public Space Space { get; }
+        private MiniGolf game;
+        private int nbPlayer;
 
-        public GameManager(){Players = new LinkedList<Player>();}
 
-        private void AddWin(Player player)
+        public GameManager(MiniGolf game)
         {
-            player.NbWin++;
+            this.game = game;
+            Players = new LinkedList<Player>();
+            nbPlayer = 0;
+
+            //Creating and configuring space
+            Space = new Space();
+            Space.ForceUpdater.Gravity = new Vector3(-0, -9.81f, 0);
+
         }
+
 
        public void AddPlayer(Player player)
        {
             Players.AddLast(player);
+            nbPlayer++;
        }
 
-
-        public void Reset(LinkedList<Player> players)
+       public void LoadGame()
         {
-            if (players == null)
+            LoadLevel(new Level(game, "StageTest"));
+            loadBall();
+        }
+
+       private void loadBall()
+        {
+            foreach(Player player in Players)
             {
-                throw new Exception("La liste des joueurs est vide");
+                player.Ball.Load(Space, game);
             }
 
-            foreach (var player in players)
-            {
-                player.Reset();
-            }
+        }
+
+       private void LoadLevel(Level level)
+        {
+            level.Load(Space, game);
         }
 
     }

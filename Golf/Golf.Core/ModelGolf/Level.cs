@@ -1,49 +1,35 @@
-﻿using Golf.Core.ModelGolf.Cam;
+﻿using BEPUphysics;
+using BEPUphysics.BroadPhaseEntries;
+using BEPUphysicsDemos;
+using BEPUutilities;
+using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Text;
+using MathHelper = BEPUutilities.MathHelper;
+using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core.ModelGolf
 {
-    class Level : GameObject
+    public class Level
     {
-        private string _nom { get; set; }
-        private int par { get; set; }
 
+        public Model ModelLevel { get; }
+        public Model ModelFinish { get; }
 
-        public Level(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, ModelRender model) : base(game, spriteBatch, graphics, model)
+        public Level(Game game, string modelName)
         {
-            LoadContent();
-            GetBounds();
-        }
 
-        protected override void LoadContent()
-        {
-            base.LoadContent();
-        }
-
-        public override void Draw(GameTime gameTime, Camera camera)
-        {
-            if (camera.BoundingVolumeIsInView(_model.BoundingSphere))
-                _model.Draw(camera.View, camera.Projection);
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
+            ModelLevel = game.Content.Load<Model>(modelName);
 
         }
 
-        public override void HandleModelCollision(GameObject otherModel)
+        public void Load(Space space, MiniGolf game)
         {
-            
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(ModelLevel, out Vector3[] vertices, out int[] indices);
+            var mesh = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
+            space.Add(mesh);
+            game.Components.Add(new StaticModel(ModelLevel, mesh.WorldTransform.Matrix, game));
         }
-
-
-
 
     }
 }

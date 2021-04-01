@@ -21,7 +21,7 @@ namespace Golf.Core.ModelGolf
             _model = model;
         }
         public abstract void HandleModelCollision(GameObject otherModel);
-        public abstract void Draw(GameTime gameTime, Camera camera);
+        //public abstract void Draw(GameTime gameTime, Camera camera);
 
         public List<BoundingBox> GetBounds()
         {

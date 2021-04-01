@@ -1,14 +1,46 @@
-﻿using Golf.Core.ModelGolf.Cam;
+﻿
+using BEPUphysics.Entities.Prefabs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using Vector3 = BEPUutilities.Vector3;
+using Matrix = BEPUutilities.Matrix;
+using BEPUphysics;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Golf.Core.ModelGolf
 {
-    public class Ball : GameObject
+    public class Ball
+    {
+        public Model Model { get; }
+        public Sphere Form { get; }
+
+        public Ball(Game game, string modelName, Vector3  position)
+        {
+
+            Model = game.Content.Load<Model>(modelName);
+            Form = new Sphere(position, 1, 10);
+         
+        }
+
+        public void Load(Space space, MiniGolf game)
+        {
+            space.Add(Form);
+            if (Model != null)
+            {
+                Matrix scaling = Matrix.CreateScale(Form.Radius, Form.Radius, Form.Radius);
+                EntityModel model = new EntityModel(Form, Model, scaling, game);
+                game.Components.Add(model);
+
+            }
+            else
+            {
+                space.Remove(Form);
+                throw new Exception("Load on model null");
+            }
+        }
+
+    }
+    /*public class Ball : GameObject
     {
         
         public Vector3 Velocity { get; set; }
@@ -67,29 +99,29 @@ namespace Golf.Core.ModelGolf
             anim.Update(gameTime.ElapsedGameTime);
             _model.Rotation = anim.Rotation;
             /*Tester si la balle est hors du terrain*/
-        }
+    /*}
 
-        public override void HandleModelCollision(GameObject otherModel)
+    public override void HandleModelCollision(GameObject otherModel)
+    {
+        if(otherModel is Ball)
         {
-            if(otherModel is Ball)
+            Ball otherBall = (Ball)otherModel;
+            if (_model.BoundingSphere.Intersects(otherBall._model.BoundingSphere))
             {
-                Ball otherBall = (Ball)otherModel;
-                if (_model.BoundingSphere.Intersects(otherBall._model.BoundingSphere))
-                {
 
-                    otherBall.Velocity = Vector3.Negate(otherBall.Velocity) + Velocity/2;
-                    otherBall.lastVelocity = Vector3.Negate(otherBall.lastVelocity);
-                    otherBall.Velocity = Vector3.Round(otherBall.Velocity);
+                otherBall.Velocity = Vector3.Negate(otherBall.Velocity) + Velocity/2;
+                otherBall.lastVelocity = Vector3.Negate(otherBall.lastVelocity);
+                otherBall.Velocity = Vector3.Round(otherBall.Velocity);
 
-                    Velocity = Vector3.Negate(Velocity);
-                    lastVelocity = Vector3.Negate(lastVelocity);
+                Velocity = Vector3.Negate(Velocity);
+                lastVelocity = Vector3.Negate(lastVelocity);
 
-                    
-                }
+
             }
-            
         }
 
     }
+
+}*/
 
 }
