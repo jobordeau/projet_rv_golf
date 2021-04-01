@@ -10,6 +10,9 @@ namespace Golf.Core.ModelGolf.Cam
     /// </summary>
     public class Camera
     {
+
+        public Matrix3x3 rotation { get; set; }
+
         /// <summary>
         /// Gets or sets the position of the camera.
         /// </summary>
@@ -164,12 +167,14 @@ namespace Golf.Core.ModelGolf.Cam
         public void Yaw(float radians)
         {
             //Rotate around the up vector.
-            Matrix3x3 rotation;
-            Matrix3x3.CreateFromAxisAngle(ref lockedUp, radians, out rotation);
-            Matrix3x3.Transform(ref viewDirection, ref rotation, out viewDirection);
+            Matrix3x3 rot;
+            Matrix3x3.CreateFromAxisAngle(ref lockedUp, radians, out rot);
+            Matrix3x3.Transform(ref viewDirection, ref rot, out viewDirection);
 
             //Avoid drift by renormalizing.
             viewDirection.Normalize();
+
+            rotation = rot;
         }
 
         /// <summary>

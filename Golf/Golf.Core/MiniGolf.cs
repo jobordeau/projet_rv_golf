@@ -15,7 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BoundingBox = BEPUutilities.BoundingBox;
 using MathHelper = BEPUutilities.MathHelper;
-using Matrix = BEPUutilities.Matrix;
+
 using Vector3 = BEPUutilities.Vector3;
 
 namespace Golf.Core
@@ -27,9 +27,7 @@ namespace Golf.Core
 
         Space space;
         Model level;
-        private Model arrive;
         private Model ball;
-        private BoundingBox boundingArrive;
         private Vector3[] vertices;
         private int[] indices;
         public KeyboardState KeyboardState;

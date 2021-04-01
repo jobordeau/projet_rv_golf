@@ -6,7 +6,7 @@ using Golf.Core;
 using Golf.Core.ModelGolf.Cam;
 using Microsoft.Xna.Framework.Input;
 
-namespace BEPUphysicsDemos
+namespace Golf.Core.ModelGolf.Cam
 {
     public class FreeCameraControlScheme : CameraControlScheme
     {
