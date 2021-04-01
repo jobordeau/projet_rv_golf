@@ -41,11 +41,12 @@ namespace Golf.Core.ModelGolf.Cam
             Pitch += Game.GamePadInput.ThumbSticks.Right.Y * 1.5f * dt;
 #else       
             MouseState mouse = Game.MouseState;
+
             if (!Game.IsMouseVisible && lastMousState != null)
             {
-                Camera.Yaw((lastMousState.X - mouse.X) * dt * 0.1f);
+                Camera.Yaw((lastMousState.X - mouse.X) * dt * 0.4f);
             }
-            Camera.Pitch((lastMousState.Y - mouse.Y) * dt * 0.1f);
+            Camera.Pitch((lastMousState.Y - mouse.Y) * dt * 0.4f);
             lastMousState = mouse;
 #endif
         }

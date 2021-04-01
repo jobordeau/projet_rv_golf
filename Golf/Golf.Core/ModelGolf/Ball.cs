@@ -28,8 +28,8 @@ namespace Golf.Core.ModelGolf
             if (Model != null)
             {
                 Matrix scaling = Matrix.CreateScale(Form.Radius, Form.Radius, Form.Radius);
-                EntityModel model = new EntityModel(Form, Model, scaling, game);
-                game.Components.Add(model);
+                EntityModel EntityModel = new EntityModel(Form, Model, scaling, game);
+                game.Components.Add(EntityModel);
 
             }
             else
@@ -39,7 +39,19 @@ namespace Golf.Core.ModelGolf
             }
         }
 
+        public bool IsMoving()
+        {
+            if (Form.LinearVelocity.Length() < 50)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
+
+    
     /*public class Ball : GameObject
     {
         
