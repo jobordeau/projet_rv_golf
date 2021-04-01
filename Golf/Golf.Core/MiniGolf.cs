@@ -28,6 +28,7 @@ namespace Golf.Core
         Space space;
         Model level;
         private Model ball;
+        private BoundingBox boundingArrive;
         private Vector3[] vertices;
         private int[] indices;
         public KeyboardState KeyboardState;
@@ -36,6 +37,8 @@ namespace Golf.Core
         public GameManager manager;
         public ChaseCameraControlScheme Camera;
         public Camera CameraClassic;
+        private int nbHits=0;
+        private Vector3 lastPosition;
 
         public MiniGolf()
         {
@@ -61,7 +64,6 @@ namespace Golf.Core
             boundingArrive = mesh.BoundingBox;
             CameraClassic = new Camera(Vector3.Zero, 0, 0, BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4, graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
             Camera = new ChaseCameraControlScheme(manager.Space.Entities[0], new Vector3(0, 7, 0), false, 50f, CameraClassic, this);
-           
         }
 
         /// <summary>
@@ -98,25 +100,33 @@ namespace Golf.Core
                 return;
             }
 
-            if(manager.Space.Entities[0].LinearVelocity != Vector3.Zero)
+            //On peut taper uniquement quand la vitesse de la balle est basse
+            if ( manager.Space.Entities[0].LinearVelocity.Length() < 50)
             {
                 if (MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection;
+                    manager.Space.Entities[0].LinearVelocity += Camera.Camera.ViewDirection * 50;
                 }
+
+                if (MouseState.RightButton == ButtonState.Pressed)
+                {
+                    manager.Space.Entities[0].LinearVelocity -= Camera.Camera.ViewDirection * 50;
+                }
+
+                nbHits++;
             }
-            
 
             if (manager.Space.Entities[0].CollisionInformation.BoundingBox.Intersects(boundingArrive))
             {
-
+                Exit();
+                return;
             }
 
             if (manager.Space.Entities[0].Position.Y < -50f)
             {
-                manager.Space.Entities[0].Position = new Vector3(0, 0, 0);
+                manager.Space.Entities[0].LinearVelocity = Vector3.Zero;
+                manager.Space.Entities[0].Position = Vector3.Zero;
             }
-
 
             manager.Space.Update();
             base.Update(gameTime);

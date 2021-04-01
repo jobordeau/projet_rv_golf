@@ -18,7 +18,7 @@ namespace Golf.Core.ModelGolf
         {
 
             Model = game.Content.Load<Model>(modelName);
-            Form = new Sphere(position, 5, 1);
+            Form = new Sphere(position, 1, 10);
          
         }
 
