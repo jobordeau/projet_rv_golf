@@ -44,9 +44,10 @@ namespace Golf.Core
         Vector2 baseScreenSize = new Vector2(1080, 720);
         private Texture2D Background;
         private int levelIndex=1;
-        private int numberOfLevels = 3;
+        private int numberOfLevels = 4;
         private bool loading = false;
         private bool ended = false;
+        private ChargeBar chargeBar;
 
         public MiniGolf()
         {
@@ -65,7 +66,10 @@ namespace Golf.Core
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            chargeBar = new ChargeBar(this, spriteBatch, graphics, new Microsoft.Xna.Framework.Vector2((1900 * Window.ClientBounds.Width) / 1980, (1100 * Window.ClientBounds.Height) / 1080));
+
             manager = new GameManager(this);
             manager.AddPlayer(new Player(Services,this, "jojo", "ball_red", new Vector3(0, -20, 0)));
             manager.LoadGame(1);
@@ -99,41 +103,39 @@ namespace Golf.Core
             {
                 Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-                if (KeyboardState.IsKeyDown(Keys.Escape))
+            if (KeyboardState.IsKeyDown(Keys.Escape))
+            {
+                Exit();
+                return;
+            }
+            
+            if (!manager.MainPlayer.Ball.IsMoving())
+            {
+                if (MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    Exit();
-                    return;
-                }
-
-                if (!manager.MainPlayer.Ball.IsMoving())
-                {
-                    if (MouseState.LeftButton == ButtonState.Pressed)
+                    if (chargeBar.Charge <= chargeBar.CHARGE_MAX)
                     {
-                        if (manager.Charge <= manager.CHARGE_MAX)
-                        {
-                            manager.Charge += 0.1f * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-                        }
-                        if (manager.Charge >= manager.CHARGE_MAX)
-                        {
-                            manager.Charge = manager.CHARGE_MAX;
-                        }
+                        chargeBar.Charge += 0.1f * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                     }
-                    if (LastMouseState.LeftButton == ButtonState.Pressed)
+                    if (chargeBar.Charge >= chargeBar.CHARGE_MAX)
                     {
-                        if (MouseState.LeftButton == ButtonState.Released)
-                        {
-                            mainEntity.LinearVelocity += Camera.Camera.ViewDirection * manager.Charge;
-                            loading = false;
-                            nbHits++;
-                        }
+                        chargeBar.Charge = chargeBar.CHARGE_MAX;
                     }
-
                 }
-                else
+                if(LastMouseState.LeftButton == ButtonState.Pressed)
                 {
-                    manager.Charge = 0;
+                    if (MouseState.LeftButton == ButtonState.Released)
+                    {
+                        mainEntity.LinearVelocity += Camera.Camera.ViewDirection * chargeBar.Charge;
+                        nbHits++;
+                    }
                 }
-                LastMouseState = MouseState;
+            }
+            else
+            {
+                chargeBar.Charge = 0;
+            }
+            LastMouseState = MouseState;
 
                 if (mainEntity.CollisionInformation.BoundingBox.Intersects(manager.MainLevel.BoundingArrive) && !loading)
                 {
@@ -150,6 +152,7 @@ namespace Golf.Core
                     mainEntity.Position = Vector3.Zero;
                 }
 
+                chargeBar.Update(gameTime);
                 manager.Space.Update();
                 base.Update(gameTime);
             }
@@ -224,7 +227,6 @@ namespace Golf.Core
             spriteBatch.Begin(SpriteSortMode.BackToFront, null);
             if (!_launched && !ended)
             {
-                
                 spriteBatch.Draw(Background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0.0f);
                 spriteBatch.End();
                 spriteBatch.Begin();
@@ -234,6 +236,7 @@ namespace Golf.Core
             {
                 DrawHud();
                 base.Draw(gameTime);
+                chargeBar.Draw(gameTime);
             }
             if (ended)
             {
@@ -272,7 +275,7 @@ namespace Golf.Core
             levelIndex += 1;
             manager.MainPlayer.AjouterScore(nbHits);
 
-            if (levelIndex % 1 == 0)
+            if (levelIndex % numberOfLevels == 0)
             {
                 ended = true;
                 return;
@@ -291,5 +294,7 @@ namespace Golf.Core
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
             spriteBatch.DrawString(font, value, position, color);
         }
+
     }
 }
+
