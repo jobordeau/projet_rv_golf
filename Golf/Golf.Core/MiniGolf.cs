@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
@@ -18,6 +19,7 @@ using MathHelper = BEPUutilities.MathHelper;
 using Apos;
 using Apos.Gui;
 using FontStashSharp;
+using Microsoft.Xna.Framework.Content;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = BEPUutilities.Vector3;
 
@@ -37,7 +39,14 @@ namespace Golf.Core
         private int nbHits=0;
         private Vector3 lastPosition;
         IMGUI _ui;
-        private bool _launched = false;
+        private bool _launched =  false;
+        private SpriteFont hudFont;
+        Vector2 baseScreenSize = new Vector2(1080, 720);
+        private Texture2D Background;
+        private int levelIndex=1;
+        private int numberOfLevels = 3;
+        private bool loading = false;
+        private bool ended = false;
 
         public MiniGolf()
         {
@@ -56,9 +65,10 @@ namespace Golf.Core
 
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(graphics.GraphicsDevice);
             manager = new GameManager(this);
-            manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, -20, 0)));
-            manager.LoadGame();
+            manager.AddPlayer(new Player(Services,this, "jojo", "ball_red", new Vector3(0, -20, 0)));
+            manager.LoadGame(1);
             CameraClassic = new Camera(Vector3.Zero, 0, 0,
                 BEPUutilities.Matrix.CreatePerspectiveFieldOfViewRH(MathHelper.PiOver4,
                     graphics.PreferredBackBufferWidth / (float)graphics.PreferredBackBufferHeight, .1f, 10000));
@@ -68,7 +78,12 @@ namespace Golf.Core
             FontSystem fontSystem = FontSystemFactory.Create(GraphicsDevice, 2048, 2048);
             fontSystem.AddFont(TitleContainer.OpenStream($"{Content.RootDirectory}/font-file.ttf"));
 
+            //hudFont = Content.Load<SpriteFont>("font-file");
+            Background = Content.Load<Texture2D>("Sprites/background_menu");
+
             GuiHelper.Setup(this, fontSystem);
+
+            hudFont = Content.Load<SpriteFont>("Hud");
 
             _ui = new IMGUI();
         }
@@ -108,6 +123,7 @@ namespace Golf.Core
                         if (MouseState.LeftButton == ButtonState.Released)
                         {
                             mainEntity.LinearVelocity += Camera.Camera.ViewDirection * manager.Charge;
+                            loading = false;
                             nbHits++;
                         }
                     }
@@ -119,10 +135,13 @@ namespace Golf.Core
                 }
                 LastMouseState = MouseState;
 
-                if (mainEntity.CollisionInformation.BoundingBox.Intersects(manager.MainLevel.BoundingArrive))
+                if (mainEntity.CollisionInformation.BoundingBox.Intersects(manager.MainLevel.BoundingArrive) && !loading)
                 {
-                    Exit();
-                    return;
+                    BoundingBox box = new BoundingBox(new Vector3(-1, -21, -1), new Vector3(1, -19, 1));
+                    mainEntity.CollisionInformation.BoundingBox = box;
+                    mainEntity.Position = Vector3.Zero;
+                    mainEntity.LinearVelocity = Vector3.Zero;
+                    LoadNextLevel(gameTime);
                 }
 
                 if (mainEntity.Position.Y < -50f || KeyboardState.IsKeyDown(Keys.R))
@@ -134,29 +153,62 @@ namespace Golf.Core
                 manager.Space.Update();
                 base.Update(gameTime);
             }
-
-
-            GuiHelper.UpdateSetup();
-            _ui.UpdateAll(gameTime);
-
-            // Create your UI.
-            Panel.Push().XY = new Vector2(700,300);
-            Label.Put("MiniGolf");
-            if (Button.Put("Launch Game").Clicked)
+            else if (!_launched && !ended )
             {
-                IsMouseVisible = false;
-                _launched = true;
+                GuiHelper.UpdateSetup();
+                _ui.UpdateAll(gameTime);
+
+                // Create your UI.
+                Panel.Push().XY = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+                Label.Put("MiniGolf");
+                if (Button.Put("Launch Game").Clicked)
+                {
+                    IsMouseVisible = false;
+                    _launched = true;
+                }
+                if (Button.Put("Quit").Clicked)
+                {
+                    Exit();
+                }
+                Panel.Pop();
+
+
+                // Call UpdateCleanup at the end.
+                GuiHelper.UpdateCleanup();
             }
-            if (Button.Put("Quit").Clicked)
+
+            if (ended)
             {
-                Exit();
+                int i = 1;
+                GuiHelper.UpdateSetup();
+                _ui.UpdateAll(gameTime);
+
+                // Create your UI.
+                Panel.Push().XY = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
+                Label.Put("Course finised");
+                Label.Put("Player : " + manager.MainPlayer.Name);
+                foreach (var score in manager.MainPlayer.Score)
+                {
+                    Label.Put($"Level {i} : "+ score.ToString());
+                    i++;
+                }
+                Label.Put("Press Echap to quit");
+                if (Button.Put("Quit").Clicked)
+                {
+                    Exit();
+                    return;
+                }
+                Panel.Pop();
+
+                // Call UpdateCleanup at the end.
+                GuiHelper.UpdateCleanup();
+
+                if (KeyboardState.IsKeyDown(Keys.Escape))
+                {
+                    Exit();
+                    return;
+                }
             }
-            Panel.Pop();
-
-
-            // Call UpdateCleanup at the end.
-            GuiHelper.UpdateCleanup();
-
             base.Update(gameTime);
         }
 
@@ -166,16 +218,78 @@ namespace Golf.Core
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.Clear(Color.LightSkyBlue);
-
-            if (!_launched)
-            { 
+            spriteBatch.Begin(SpriteSortMode.BackToFront, null);
+            if (!_launched && !ended)
+            {
+                
+                spriteBatch.Draw(Background, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), null, Color.White, 0, Vector2.Zero, SpriteEffects.None, 0.0f);
+                spriteBatch.End();
+                spriteBatch.Begin();
                 _ui.Draw(gameTime);
             }
             else
             {
+                DrawHud();
                 base.Draw(gameTime);
             }
+            if (ended)
+            {
+                _launched = false;
+                IsMouseVisible = true;
+                _ui.Draw(gameTime);
+            }
+            spriteBatch.End();
+        }
+
+        private void DrawHud()
+        {
+            Rectangle titleSafeArea = GraphicsDevice.Viewport.TitleSafeArea;
+            Vector2 hudLocation = new Vector2(titleSafeArea.X, titleSafeArea.Y);
+            //Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
+            //                             titleSafeArea.Y + titleSafeArea.Height / 2.0f);
+
+            Vector2 center = new Vector2(baseScreenSize.X / 2, baseScreenSize.Y / 2);
+
+            // Draw time remaining. Uses modulo division to cause blinking when the
+            // player is running out of time.
+            string timeString = "Niveau: " + levelIndex;
+            Color timeColor;
+            timeColor= Color.Black;
+            DrawShadowedString(hudFont, timeString, hudLocation, timeColor);
+
+            // Draw score
+            float timeHeight = hudFont.MeasureString(timeString).Y;
+            DrawShadowedString(hudFont, "Coups: " + nbHits.ToString(), hudLocation + new Vector2(0.0f, timeHeight * 1.2f), Color.Yellow);
+        }
+
+        private void LoadNextLevel(GameTime gameTime)
+        {
+            loading = true;
+            // move to the next level
+            levelIndex += 1;
+            manager.MainPlayer.AjouterScore(nbHits);
+
+            if (levelIndex % 1 == 0)
+            {
+                ended = true;
+                return;
+            }
+
+            // Unloads the content for the current level before loading the next one.
+            manager.UnloadGame();
+            manager.LoadGame(levelIndex);
+
+            
+            nbHits = 0;
+        }
+
+        private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)
+        {
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
+            spriteBatch.DrawString(font, value, position, color);
         }
     }
 }

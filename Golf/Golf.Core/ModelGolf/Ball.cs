@@ -6,20 +6,28 @@ using Vector3 = BEPUutilities.Vector3;
 using Matrix = BEPUutilities.Matrix;
 using BEPUphysics;
 using System;
+using Microsoft.Xna.Framework.Content;
 
 namespace Golf.Core.ModelGolf
 {
-    public class Ball
+    public class Ball : IDisposable
     {
         public Model Model { get; }
         public Sphere Form { get; }
+        public Game Game { get; }
 
         public Ball(Game game, string modelName, Vector3  position)
         {
-
+            Game = game;
             Model = game.Content.Load<Model>(modelName);
             Form = new Sphere(position, 1, 10);
-         
+        }
+
+        public Ball(Ball ball)
+        {
+            Game = ball.Game;
+            Model = ball.Model;
+            Form = ball.Form;
         }
 
         public void Load(Space space, MiniGolf game)
@@ -41,7 +49,7 @@ namespace Golf.Core.ModelGolf
 
         public bool IsMoving()
         {
-            if (Form.LinearVelocity.Length() < 50)
+            if (Form.LinearVelocity.Length() < 10)
             {
                 return false;
             }
@@ -49,6 +57,15 @@ namespace Golf.Core.ModelGolf
             return true;
         }
 
+        public void Dispose()
+        {
+            Game.Content.Dispose();
+        }
+
+        public void RemoveFromSpace(Space space)
+        {
+            space.Remove(Form);
+        }
     }
 
     
