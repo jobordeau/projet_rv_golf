@@ -22,7 +22,7 @@ namespace Golf.Core.ModelGolf
             {
                 if(currentObject != element)
                 {
-                    currentObject.HandleModelCollision(element);
+                    //currentObject.HandleModelCollision(element);
                 }
             }
         }

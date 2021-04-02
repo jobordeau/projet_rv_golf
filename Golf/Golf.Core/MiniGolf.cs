@@ -32,6 +32,7 @@ namespace Golf.Core
         public ChaseCameraControlScheme Camera;
         public Camera CameraClassic;
         private int nbHits=0;
+        private ChargeBar chargeBar;
 
         public MiniGolf()
         {
@@ -49,6 +50,11 @@ namespace Golf.Core
 
         protected override void LoadContent()
         {
+           
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            chargeBar = new ChargeBar(this, spriteBatch, graphics, new Microsoft.Xna.Framework.Vector2((1900 * Window.ClientBounds.Width) / 1980, (1100 * Window.ClientBounds.Height) / 1080));
+
             manager = new GameManager(this);
             manager.AddPlayer(new Player(this, "jojo", "ball_red", new Vector3(0, 0, 0)));
             manager.LoadGame();
@@ -95,20 +101,20 @@ namespace Golf.Core
             {
                 if (MouseState.LeftButton == ButtonState.Pressed)
                 {
-                    if (manager.Charge <= manager.CHARGE_MAX)
+                    if (chargeBar.Charge <= chargeBar.CHARGE_MAX)
                     {
-                        manager.Charge += 0.1f * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                        chargeBar.Charge += 0.1f * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                     }
-                    if (manager.Charge >= manager.CHARGE_MAX)
+                    if (chargeBar.Charge >= chargeBar.CHARGE_MAX)
                     {
-                        manager.Charge = manager.CHARGE_MAX;
+                        chargeBar.Charge = chargeBar.CHARGE_MAX;
                     }
                 }
                 if(LastMouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (MouseState.LeftButton == ButtonState.Released)
                     {
-                        mainEntity.LinearVelocity += Camera.Camera.ViewDirection * manager.Charge;
+                        mainEntity.LinearVelocity += Camera.Camera.ViewDirection * chargeBar.Charge;
                         nbHits++;
                     }
                 }
@@ -116,7 +122,7 @@ namespace Golf.Core
             }
             else
             {
-                manager.Charge = 0;
+                chargeBar.Charge = 0;
             }
             LastMouseState = MouseState;
 
@@ -132,6 +138,7 @@ namespace Golf.Core
                 mainEntity.Position = Vector3.Zero;
             }
 
+            chargeBar.Update(gameTime);
             manager.Space.Update();
             base.Update(gameTime);
         }
@@ -143,7 +150,12 @@ namespace Golf.Core
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.LightSkyBlue);
+            GraphicsDevice.BlendState = BlendState.Opaque;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
             base.Draw(gameTime);
+            chargeBar.Draw(gameTime);
+
         }
     }
 }

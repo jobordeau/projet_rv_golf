@@ -18,8 +18,6 @@ namespace Golf.Core.ModelGolf
         private MiniGolf game;
         public Level MainLevel { get; private set; }
         public Player MainPlayer { get; private set; }
-        public float Charge { get; set; }
-        public readonly float  CHARGE_MAX;
         private int nbPlayer;
 
 
@@ -28,8 +26,7 @@ namespace Golf.Core.ModelGolf
             this.game = game;
             Players = new LinkedList<Player>();
             nbPlayer = 0;
-            Charge = 0;
-            CHARGE_MAX = 200;
+            
 
             //Creating and configuring space
             Space = new Space();
