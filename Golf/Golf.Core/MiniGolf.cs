@@ -287,6 +287,7 @@ namespace Golf.Core
 
             
             nbHits = 0;
+            loading = false;
         }
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color)
