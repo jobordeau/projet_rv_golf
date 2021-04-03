@@ -188,7 +188,7 @@ namespace Golf.Core
 
                 // Create your UI.
                 Panel.Push().XY = new Vector2(graphics.PreferredBackBufferWidth / 2, graphics.PreferredBackBufferHeight / 2);
-                Label.Put("Course finised");
+                Label.Put("Course finished");
                 Label.Put("Player : " + manager.MainPlayer.Name);
                 foreach (var score in manager.MainPlayer.Score)
                 {
