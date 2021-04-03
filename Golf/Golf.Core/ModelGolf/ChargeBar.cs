@@ -16,10 +16,7 @@ namespace Golf.Core.ModelGolf
             CHARGE_MAX = 200;
             this.pos = pos;
             ratio = (int)((Charge * 400) / CHARGE_MAX);
-            
-
-                
-            }
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -50,9 +47,8 @@ namespace Golf.Core.ModelGolf
                 Color[] data = new Color[30 * ratio];
                 for (int i = 0; i < data.Length; i++) data[i] = color;
                 rect.SetData(data);
-                _spriteBatch.Begin();
                 _spriteBatch.Draw(rect, pos,null, Color.White, MathHelper.Pi, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
-                _spriteBatch.End();
+                
             }
         }
     }
