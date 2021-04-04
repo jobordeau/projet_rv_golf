@@ -13,7 +13,7 @@ namespace Golf.Core.ModelGolf.Cam
     /// </summary>
     public abstract class CameraControlScheme
     {
-        MouseState lastMousState;
+        MouseState _lastMousState;
         /// <summary>
         /// Gets the game associated with the camera.
         /// </summary>
@@ -42,12 +42,12 @@ namespace Golf.Core.ModelGolf.Cam
 #else       
             MouseState mouse = Game.MouseState;
 
-            if (!Game.IsMouseVisible && lastMousState != null)
+            if (!Game.IsMouseVisible && _lastMousState != null)
             {
-                Camera.Yaw((lastMousState.X - mouse.X) * dt * 0.4f);
+                Camera.Yaw((_lastMousState.X - mouse.X) * dt * 0.4f);
             }
-            Camera.Pitch((lastMousState.Y - mouse.Y) * dt * 0.4f);
-            lastMousState = mouse;
+            Camera.Pitch((_lastMousState.Y - mouse.Y) * dt * 0.4f);
+            _lastMousState = mouse;
 #endif
         }
     }

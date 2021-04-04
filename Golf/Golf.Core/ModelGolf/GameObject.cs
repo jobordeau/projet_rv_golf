@@ -9,21 +9,46 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf
 {
+    /// <summary>
+    /// Class defining an object that will be showed in the game
+    /// </summary>
     public abstract class GameObject : DrawableGameComponent
     {
-        protected readonly GraphicsDeviceManager _graphics;
-        protected readonly SpriteBatch _spriteBatch;
+        /// <summary>
+        /// Current graphic device 
+        /// </summary>
+        protected readonly GraphicsDeviceManager Graphics;
+        /// <summary>
+        /// The current SpriteBatch
+        /// </summary>
+        protected readonly SpriteBatch SpriteBatch;
 
+        /// <summary>
+        /// The constructor of a game object
+        /// </summary>
+        /// <param name="game">the current game</param>
+        /// <param name="spriteBatch">the current sprite batch</param>
+        /// <param name="graphics">the current graphic device</param>
         public GameObject(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics) : base(game)
         {
-            _graphics = graphics;
-            _spriteBatch = spriteBatch;
+            Graphics = graphics;
+            SpriteBatch = spriteBatch;
         }
 
+        /// <summary>
+        /// Method defining the update method of the object
+        /// </summary>
+        /// <param name="gameTime"></param>
         public abstract override void Update(GameTime gameTime);
 
+        /// <summary>
+        /// Method defining the drawing method of the object
+        /// </summary>
+        /// <param name="gameTime"></param>
         public abstract override void Draw(GameTime gameTime);
 
+
+        //First implementation trying to get the bounding box of the model
         /* public abstract void HandleModelCollision(GameObject otherModel);
          //public abstract void Draw(GameTime gameTime, Camera camera);
 

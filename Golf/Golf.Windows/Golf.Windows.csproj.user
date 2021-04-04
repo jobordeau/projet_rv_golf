@@ -3,5 +3,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DeviceId>30f105c9-681e-420b-a277-7c086ead8a4e</DeviceId>
     <UseEmulator>false</UseEmulator>
+    <UseSimulator>false</UseSimulator>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Source>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</Source>
+    <SmallTileSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</SmallTileSource>
+    <MediumTileSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</MediumTileSource>
+    <WideTileSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</WideTileSource>
+    <LargeTileSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</LargeTileSource>
+    <AppIconSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</AppIconSource>
+    <SplashScreenSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</SplashScreenSource>
+    <PackageLogoSource>C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Core\Content\Sprites\background_menu.jpg</PackageLogoSource>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>x86|x64|arm</AppxBuildConfigurationSelection>
+    <PackageOptionalProjectsInIdeBuilds>True</PackageOptionalProjectsInIdeBuilds>
+    <BadgeLogoSource>C:\Users\yoann\source\repos\projet_rv_golf\Documentation\logo.png</BadgeLogoSource>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DeviceId>30f105c9-681e-420b-a277-7c086ead8a4e</DeviceId>
+    <UseEmulator>true</UseEmulator>
   </PropertyGroup>
 </Project>

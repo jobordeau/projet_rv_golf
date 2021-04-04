@@ -1,0 +1,6 @@
+MainPackage=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\ARM\Debug\Golf.Windows_1.0.1.0_ARM_Debug.appx
+SymbolPackage=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\obj\ARM\Debug\Symbols\Golf.Windows_1.0.1.0_ARM_Debug.appxsym
+ResourcePack=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\ARM\Debug\Golf.Windows_1.0.1.0_scale-100.appx
+ResourcePack=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\ARM\Debug\Golf.Windows_1.0.1.0_scale-125.appx
+ResourcePack=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\ARM\Debug\Golf.Windows_1.0.1.0_scale-150.appx
+ResourcePack=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\ARM\Debug\Golf.Windows_1.0.1.0_scale-400.appx

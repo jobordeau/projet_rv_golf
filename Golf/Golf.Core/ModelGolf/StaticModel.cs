@@ -11,12 +11,12 @@ namespace Golf.Core.ModelGolf
     /// </summary>
     public class StaticModel : DrawableGameComponent
     {
-        Model model;
+        Model _model;
         /// <summary>
         /// Base transformation to apply to the model.
         /// </summary>
         public Matrix Transform;
-        Microsoft.Xna.Framework.Matrix[] boneTransforms;
+        Microsoft.Xna.Framework.Matrix[] _boneTransforms;
 
 
         /// <summary>
@@ -28,12 +28,12 @@ namespace Golf.Core.ModelGolf
         public StaticModel(Model model, Matrix transform, Game game)
             : base(game)
         {
-            this.model = model;
+            this._model = model;
             this.Transform = transform;
 
             //Collect any bone transformations in the model itself.
             //The default cube model doesn't have any, but this allows the StaticModel to work with more complicated shapes.
-            boneTransforms = new Microsoft.Xna.Framework.Matrix[model.Bones.Count];
+            _boneTransforms = new Microsoft.Xna.Framework.Matrix[model.Bones.Count];
             foreach (ModelMesh mesh in model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
@@ -45,12 +45,12 @@ namespace Golf.Core.ModelGolf
 
         public override void Draw(GameTime gameTime)
         {
-            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-            foreach (ModelMesh mesh in model.Meshes)
+            _model.CopyAbsoluteBoneTransformsTo(_boneTransforms);
+            foreach (ModelMesh mesh in _model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
-                    effect.World = boneTransforms[mesh.ParentBone.Index] * MathConverter.Convert(Transform);
+                    effect.World = _boneTransforms[mesh.ParentBone.Index] * MathConverter.Convert(Transform);
                     effect.View = MathConverter.Convert((Game as MiniGolf).CameraClassic.ViewMatrix);
                     effect.Projection = MathConverter.Convert((Game as MiniGolf).CameraClassic.ProjectionMatrix);
                 }

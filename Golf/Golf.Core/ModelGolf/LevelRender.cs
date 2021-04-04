@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Golf.Core.ModelGolf
 {
+    /// <summary>
+    /// The first implementation of the level renderer of the game
+    /// </summary>
     public class LevelRender
     {
         public Vector3 Position { get; set; }
@@ -10,8 +13,8 @@ namespace Golf.Core.ModelGolf
         public Vector3 Scale { get; set; }
 
         public Model Model { get; private set; }
-        private Matrix[] modelTransforms;
-        private BoundingBox boundingBox;
+        private Matrix[] _modelTransforms;
+        private BoundingBox _boundingBox;
         public BoundingBox BoundingBox
         {
             get
@@ -19,20 +22,20 @@ namespace Golf.Core.ModelGolf
                 // No need for rotation, as this is a sphere
                 Matrix worldTransform = Matrix.CreateScale(Scale) * Matrix.CreateTranslation(Position);
 
-                BoundingBox transformed = boundingBox;
+                BoundingBox transformed = _boundingBox;
 
                 return transformed;
             }
         }
-        public LevelRender(Model Model, Vector3 Position, Vector3 Rotation, Vector3 Scale)
+        public LevelRender(Model model, Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            this.Model = Model;
+            this.Model = model;
 
-            modelTransforms = new Matrix[Model.Bones.Count];
-            Model.CopyAbsoluteBoneTransformsTo(modelTransforms);
+            _modelTransforms = new Matrix[model.Bones.Count];
+            model.CopyAbsoluteBoneTransformsTo(_modelTransforms);
 
-            this.Position = Position;
-            this.Scale = Scale;
+            this.Position = position;
+            this.Scale = scale;
 
             BuildBoundingRectangle();
         }
@@ -43,7 +46,7 @@ namespace Golf.Core.ModelGolf
 
 
 
-        public void Draw(Matrix View, Matrix Projection)
+        public void Draw(Matrix view, Matrix projection)
         {
             // Calculate the base transformation by combining
             // translation, rotation, and scaling
@@ -51,15 +54,15 @@ namespace Golf.Core.ModelGolf
 
             foreach (ModelMesh mesh in Model.Meshes)
             {
-                Matrix localWorld = modelTransforms[mesh.ParentBone.Index] * baseWorld;
+                Matrix localWorld = _modelTransforms[mesh.ParentBone.Index] * baseWorld;
 
                 foreach (ModelMeshPart meshPart in mesh.MeshParts)
                 {
                     BasicEffect effect = (BasicEffect)meshPart.Effect;
 
                     effect.World = localWorld;
-                    effect.View = View;
-                    effect.Projection = Projection;
+                    effect.View = view;
+                    effect.Projection = projection;
 
                     //effect.EnableDefaultLighting();
                 }

@@ -7,86 +7,139 @@ using System.Text;
 
 namespace Golf.Core.ModelGolf
 {
+    /// <summary>
+    /// The class defining the management of the sound
+    /// </summary>
     class SoundManager
     {
-        List<SoundEffect> hit_hard;
-        List<SoundEffect> hit_medium;
-        List<SoundEffect> hit_short;
-        List<SoundEffect> col_hard;
-        List<SoundEffect> col_medium;
-        List<SoundEffect> col_short;
-        List<SoundEffectInstance> rolls;
-        SoundEffectInstance lastRoll;
-        SoundEffectInstance clap;
-        SoundEffectInstance success;
-        SoundEffectInstance reset;
-        Song ambiant;
-        Random random;
-
+        /// <summary>
+        /// The sound for a hard hit
+        /// </summary>
+        private readonly List<SoundEffect> _hitHard;
+        /// <summary>
+        /// The sound for a medium hit
+        /// </summary>
+        private readonly List<SoundEffect> _hitMedium;
+        /// <summary>
+        /// The sound for a short hit
+        /// </summary>
+        private readonly List<SoundEffect> _hitShort;
+        /// <summary>
+        /// The sound for a hard collision
+        /// </summary>
+        private readonly List<SoundEffect> _colHard;
+        /// <summary>
+        /// The sound for a medium collision
+        /// </summary>
+        private readonly List<SoundEffect> _colMedium;
+        /// <summary>
+        /// The sound for a short collision
+        /// </summary>
+        private readonly List<SoundEffect> _colShort;
+        /// <summary>
+        /// The sound for the rolling of the ball
+        /// </summary>
+        private readonly List<SoundEffectInstance> _rolls;
+        /// <summary>
+        /// The last roll sound
+        /// </summary>
+        private SoundEffectInstance _lastRoll;
+        /// <summary>
+        /// The clap sound
+        /// </summary>
+        private readonly SoundEffectInstance _clap;
+        /// <summary>
+        /// The success sound
+        /// </summary>
+        private readonly SoundEffectInstance _success;
+        /// <summary>
+        /// The reset sound
+        /// </summary>
+        private readonly SoundEffectInstance _reset;
+        /// <summary>
+        /// The ambient sound
+        /// </summary>
+        private readonly Song _ambient;
+        /// <summary>
+        /// The randomize class
+        /// </summary>
+        private readonly Random _random;
+        /// <summary>
+        ///Constructor of the sound manager
+        /// </summary>
+        /// <param name="game">the current game</param>
         public SoundManager(MiniGolf game)
         {
-            random = new Random();
+            _random = new Random();
             
-            hit_hard = new List<SoundEffect>();
-            hit_medium = new List<SoundEffect>();
-            hit_short = new List<SoundEffect>();
-            col_hard = new List<SoundEffect>();
-            col_medium = new List<SoundEffect>();
-            col_short = new List<SoundEffect>();
-            rolls = new List<SoundEffectInstance>();
+            _hitHard = new List<SoundEffect>();
+            _hitMedium = new List<SoundEffect>();
+            _hitShort = new List<SoundEffect>();
+            _colHard = new List<SoundEffect>();
+            _colMedium = new List<SoundEffect>();
+            _colShort = new List<SoundEffect>();
+            _rolls = new List<SoundEffectInstance>();
 
-            hit_medium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-1"));
-            hit_medium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-2"));
-            hit_medium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-3"));
-            hit_hard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-1"));
-            hit_hard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-2"));
-            hit_hard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-3"));
-            hit_short.Add(game.Content.Load<SoundEffect>("sound/hit-short-1"));
-            hit_short.Add(game.Content.Load<SoundEffect>("sound/hit-short-2"));
-            hit_short.Add(game.Content.Load<SoundEffect>("sound/hit-short-3"));
+            _hitMedium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-1"));
+            _hitMedium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-2"));
+            _hitMedium.Add(game.Content.Load<SoundEffect>("sound/hit-medium-3"));
+            _hitHard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-1"));
+            _hitHard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-2"));
+            _hitHard.Add(game.Content.Load<SoundEffect>("sound/hit-hard-3"));
+            _hitShort.Add(game.Content.Load<SoundEffect>("sound/hit-short-1"));
+            _hitShort.Add(game.Content.Load<SoundEffect>("sound/hit-short-2"));
+            _hitShort.Add(game.Content.Load<SoundEffect>("sound/hit-short-3"));
 
-            col_hard.Add(game.Content.Load<SoundEffect>("sound/col-hard-1"));
-            col_hard.Add(game.Content.Load<SoundEffect>("sound/col-hard-2"));
-            col_medium.Add(game.Content.Load<SoundEffect>("sound/col-medium-1"));
-            col_short.Add(game.Content.Load<SoundEffect>("sound/col-short-1"));
-            rolls.Add(game.Content.Load<SoundEffect>("sound/roll-1").CreateInstance());
-            rolls.Add(game.Content.Load<SoundEffect>("sound/roll-2").CreateInstance());
-            rolls.Add(game.Content.Load<SoundEffect>("sound/roll-3").CreateInstance());
+            _colHard.Add(game.Content.Load<SoundEffect>("sound/col-hard-1"));
+            _colHard.Add(game.Content.Load<SoundEffect>("sound/col-hard-2"));
+            _colMedium.Add(game.Content.Load<SoundEffect>("sound/col-medium-1"));
+            _colShort.Add(game.Content.Load<SoundEffect>("sound/col-short-1"));
+            _rolls.Add(game.Content.Load<SoundEffect>("sound/roll-1").CreateInstance());
+            _rolls.Add(game.Content.Load<SoundEffect>("sound/roll-2").CreateInstance());
+            _rolls.Add(game.Content.Load<SoundEffect>("sound/roll-3").CreateInstance());
 
-            success = game.Content.Load<SoundEffect>("sound/success").CreateInstance();
-            clap = game.Content.Load<SoundEffect>("sound/clap").CreateInstance();
-            reset = game.Content.Load<SoundEffect>("sound/out").CreateInstance();
+            _success = game.Content.Load<SoundEffect>("sound/success").CreateInstance();
+            _clap = game.Content.Load<SoundEffect>("sound/clap").CreateInstance();
+            _reset = game.Content.Load<SoundEffect>("sound/out").CreateInstance();
 
-            ambiant = game.Content.Load<Song>("sound/ambiant");
+            _ambient = game.Content.Load<Song>("sound/ambiant");
             MediaPlayer.IsRepeating = true;
             
 
-            rolls[2].Volume = 0.5f;
-            lastRoll = rolls[0];
+            _rolls[2].Volume = 0.5f;
+            _lastRoll = _rolls[0];
         }
 
+        /// <summary>
+        /// Method defining the sound on a hit
+        /// </summary>
+        /// <param name="chargeBar">the current charge bar</param>
         public void Hit(ChargeBar chargeBar)
         {
-            int ratio = (int)((chargeBar.Charge * 400) / chargeBar.CHARGE_MAX);
+            int ratio = (int)((chargeBar.Charge * 400) / chargeBar.ChargeMax);
             if (ratio < (400 / 3) * 2)
             {
                 if(ratio < 400 / 3)
                 {
-                    hit_short[random.Next(hit_short.Count)].Play();
+                    _hitShort[_random.Next(_hitShort.Count)].Play();
                 }
                 else
                 {
-                    hit_medium[random.Next(hit_medium.Count)].Play();
+                    _hitMedium[_random.Next(_hitMedium.Count)].Play();
                 }
             }
             else
             {
-                hit_hard[random.Next(hit_hard.Count)].Play();
+                _hitHard[_random.Next(_hitHard.Count)].Play();
             }
             
             
         }
 
+        /// <summary>
+        /// Method defining the sound of an impact
+        /// </summary>
+        /// <param name="entity">the entity concerned by the impact</param>
         public void Impact(Entity entity)
         {
             float velocity = entity.LinearVelocity.Length();
@@ -94,85 +147,104 @@ namespace Golf.Core.ModelGolf
             {
                 if (velocity < 200 / 3)
                 {
-                    col_short[random.Next(col_short.Count)].Play();
+                    _colShort[_random.Next(_colShort.Count)].Play();
                 }
                 else
                 {
-                    col_medium[random.Next(col_medium.Count)].Play();
+                    _colMedium[_random.Next(_colMedium.Count)].Play();
                 }
             }
             else
             {
-                col_hard[random.Next(col_hard.Count)].Play();
+                _colHard[_random.Next(_colHard.Count)].Play();
             }
         }
 
+        /// <summary>
+        /// Method defining the rolling sound
+        /// </summary>
+        /// <param name="entity">The entity rolling</param>
         public void Roll(Entity entity)
         {
-
-            SoundEffectInstance roll;
-
-            if (SoundState.Stopped == lastRoll.State)
+            if (SoundState.Stopped == _lastRoll.State)
             {
                 float velocity = entity.LinearVelocity.Length();
                 if (velocity < (200 / 3) * 2)
                 {
                     if (velocity < 200 / 3)
                     {
-                        lastRoll = rolls[0];
+                        _lastRoll = _rolls[0];
                     }
                     else
                     {
-                        lastRoll = rolls[2];
+                        _lastRoll = _rolls[2];
                     }
                 }
                 else
                 {
-                    lastRoll = rolls[1];
+                    _lastRoll = _rolls[1];
                 }
-                lastRoll.Play();
+                _lastRoll.Play();
 
             }
             
             
         }
 
+        /// <summary>
+        /// Method defining when the rolling stops
+        /// </summary>
         public void RollStop()
         {
-            lastRoll.Stop();
+            _lastRoll.Stop();
         }
 
+        /// <summary>
+        /// Method defining the ambient sound
+        /// </summary>
         public void PlayAmbiant()
         {
-            MediaPlayer.Play(ambiant);
+            MediaPlayer.Play(_ambient);
         }
 
+        /// <summary>
+        /// Method defining the stop of the ambient sound
+        /// </summary>
         public void StopAmbiant()
         {
             MediaPlayer.Stop();
         }
 
+        /// <summary>
+        /// Method defining the clap sound
+        /// </summary>
         public void Clap()
         {
-            if (SoundState.Stopped == clap.State)
+            if (SoundState.Stopped == _clap.State)
             {
-                clap.Play();
+                _clap.Play();
             }
         }
 
+        /// <summary>
+        /// Method defining the success sound
+        /// </summary>
         public void Success()
         {
-            if (SoundState.Stopped == success.State)
+            if (SoundState.Stopped == _success.State)
             {
-                success.Play();
+                _success.Play();
             }
         }
 
+        /// <summary>
+        /// Method defining the out sound
+        /// </summary>
         public void Out()
         {
-            if (SoundState.Stopped == reset.State)
+            if (SoundState.Stopped == _reset.State)
             {
-                reset.Play();
+                _reset.Play();
             }
         }
     }

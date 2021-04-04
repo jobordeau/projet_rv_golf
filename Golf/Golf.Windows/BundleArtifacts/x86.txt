@@ -1,0 +1,2 @@
+MainPackage=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\bin\WindowsUniversal\x86\Debug\Golf.Windows_1.0.1.0_x86_Debug.appx
+SymbolPackage=C:\Users\yoann\source\repos\projet_rv_golf\Golf\Golf.Windows\obj\x86\Debug\Symbols\Golf.Windows_1.0.1.0_x86_Debug.appxsym

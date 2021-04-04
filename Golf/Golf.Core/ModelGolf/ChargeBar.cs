@@ -3,51 +3,87 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Golf.Core.ModelGolf
 {
+    /// <summary>
+    /// Class defining the charging bar
+    /// </summary>
     class ChargeBar : GameObject
     {
+        /// <summary>
+        /// Current charge of the bar
+        /// </summary>
         public float Charge { get; set; }
-        public readonly float CHARGE_MAX;
-        private Color color;
-        private Vector2 pos;
-        private int ratio;
+        /// <summary>
+        /// The maximum charge you can reach
+        /// </summary>
+        public readonly float ChargeMax;
+        /// <summary>
+        /// The current color of the bar
+        /// </summary>
+        private Color _color;
+        /// <summary>
+        /// The position of the charging bar
+        /// </summary>
+        private Vector2 _pos;
+        /// <summary>
+        /// The ratio of the charge
+        /// </summary>
+        private int _ratio;
+
+        /// <summary>
+        /// Constructor of the charge bar
+        /// </summary>
+        /// <param name="game">The current Game</param>
+        /// <param name="spriteBatch">The current spriteBatch</param>
+        /// <param name="graphics">The current graphic device</param>
+        /// <param name="pos">The position the bar will be draw</param>
         public ChargeBar(Game game, SpriteBatch spriteBatch, GraphicsDeviceManager graphics, Vector2 pos) : base(game,spriteBatch,graphics)
         {
             Charge = 0;
-            CHARGE_MAX = 200;
-            this.pos = pos;
-            ratio = (int)((Charge * 400) / CHARGE_MAX);
+            ChargeMax = 200;
+            this._pos = pos;
+            _ratio = (int)((Charge * 400) / ChargeMax);
         }
 
+        /// <summary>
+        /// Method defining the update of the bar
+        /// </summary>
+        /// <param name="gameTime">The game time</param>
         public override void Update(GameTime gameTime)
         {
-            ratio = (int)((Charge * 400) / CHARGE_MAX);
+            //Showing a different color according to the charge of the bar
+            _ratio = (int)((Charge * 400) / ChargeMax);
 
-            if (ratio < 400 / 3)
+            if (_ratio < 400 / 3)
             {
-                color = Color.Green;
+                _color = Color.Green;
             }
             else
             {
-                if (ratio < (400 / 3) * 2)
+                if (_ratio < (400 / 3) * 2)
                 {
-                    color = Color.Orange;
+                    _color = Color.Orange;
                 }
                 else
                 {
-                    color = Color.Red;
+                    _color = Color.Red;
                 }
             }
         }
 
+        /// <summary>
+        /// Method defining the drawing of the element
+        /// </summary>
+        /// <param name="gameTime">the game time</param>
         public override void Draw(GameTime gameTime)
         {
-            if(ratio > 0)
+            //We draw the element only if it have a charge
+            if(_ratio > 0)
             {
-                Texture2D rect = new Texture2D(_graphics.GraphicsDevice, 30, ratio);
-                Color[] data = new Color[30 * ratio];
-                for (int i = 0; i < data.Length; i++) data[i] = color;
+                Texture2D rect = new Texture2D(Graphics.GraphicsDevice, 30, _ratio);
+                Color[] data = new Color[30 * _ratio];
+                for (int i = 0; i < data.Length; i++) data[i] = _color;
                 rect.SetData(data);
-                _spriteBatch.Draw(rect, pos,null, Color.White, MathHelper.Pi, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
+                SpriteBatch.Draw(rect, _pos,null, Color.White, MathHelper.Pi, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
                 
             }
         }

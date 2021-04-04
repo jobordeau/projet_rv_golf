@@ -8,8 +8,8 @@
 
   <Identity
     Name="4dfa9039-3fac-47ef-aca5-bc6f8564f920"
-    Publisher="CN=User"
-    Version="1.0.0.0" />
+    Publisher="CN=PERIQUOI_BORDEAU"
+    Version="1.0.1.0" />
 
   <mp:PhoneIdentity PhoneProductId="4dfa9039-3fac-47ef-aca5-bc6f8564f920" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -32,13 +32,14 @@
       Executable="Golf.Windows.exe"
       EntryPoint="Golf.Windows.App">
       <uap:VisualElements
-        DisplayName="Golf.Windows"
+        DisplayName="MiniGolf"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="Golf.Windows"
+        Description="MiniGolf is a 3D golf game made with MonoGame"
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:LockScreen BadgeLogo="Assets\BadgeLogo.png" Notification="badge"/>
       </uap:VisualElements>
     </Application>
   </Applications>

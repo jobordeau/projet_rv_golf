@@ -10,19 +10,40 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Golf.Core.ModelGolf
 {
+    /// <summary>
+    /// Class representing the golf ball
+    /// </summary>
     public class Ball : IDisposable
     {
+        /// <summary>
+        /// The graphic model of the ball
+        /// </summary>
         public Model Model { get; }
+        /// <summary>
+        /// The logic model of the ball using Bepu sphere
+        /// </summary>
         public Sphere Form { get; }
+        /// <summary>
+        /// The current game
+        /// </summary>
         public Game Game { get; }
-
+        
+        /// <summary>
+        /// Constructor of the ball
+        /// </summary>
+        /// <param name="game">Current game</param>
+        /// <param name="modelName">Model of the ball</param>
+        /// <param name="position">Starting position of the ball</param>
         public Ball(Game game, string modelName, Vector3  position)
         {
             Game = game;
             Model = game.Content.Load<Model>(modelName);
             Form = new Sphere(position, 1, 10);
         }
-
+        /// <summary>
+        /// Constructor of the ball
+        /// </summary>
+        /// <param name="ball">the other ball we want to copy</param>
         public Ball(Ball ball)
         {
             Game = ball.Game;
@@ -30,14 +51,19 @@ namespace Golf.Core.ModelGolf
             Form = ball.Form;
         }
 
+        /// <summary>
+        /// Method for loading the ball into the game
+        /// </summary>
+        /// <param name="space">Space the ball will be added</param>
+        /// <param name="game">The current game</param>
         public void Load(Space space, Game game)
         {
             space.Add(Form);
             if (Model != null)
             {
                 Matrix scaling = Matrix.CreateScale(Form.Radius, Form.Radius, Form.Radius);
-                EntityModel EntityModel = new EntityModel(Form, Model, scaling, game);
-                game.Components.Add(EntityModel);
+                EntityModel entityModel = new EntityModel(Form, Model, scaling, game);
+                game.Components.Add(entityModel);
 
             }
             else
@@ -47,6 +73,10 @@ namespace Golf.Core.ModelGolf
             }
         }
 
+        /// <summary>
+        /// Method in order to check if the ball is moving
+        /// </summary>
+        /// <returns>mobility state of the ball</returns>
         public bool IsMoving()
         {
             if (Form.LinearVelocity.Length() < 10)
@@ -57,18 +87,25 @@ namespace Golf.Core.ModelGolf
             return true;
         }
 
+        /// <summary>
+        /// Method in order to dispose the model in the current game
+        /// </summary>
         public void Dispose()
         {
             Game.Content.Dispose();
         }
 
+        /// <summary>
+        /// Method to remove the object from the space
+        /// </summary>
+        /// <param name="space">Current space</param>
         public void RemoveFromSpace(Space space)
         {
             space.Remove(Form);
         }
     }
 
-    
+    //First implementation of the ball
     /*public class Ball : GameObject
     {
         

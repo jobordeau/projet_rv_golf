@@ -38,7 +38,7 @@ namespace BEPUphysicsDemos
         public float ChaseCameraMargin { get; set; }
 
         //The raycast filter limits the results retrieved from the Space.RayCast while in chase camera mode.
-        Func<BroadPhaseEntry, bool> rayCastFilter;
+        Func<BroadPhaseEntry, bool> _rayCastFilter;
         bool RayCastFilter(BroadPhaseEntry entry)
         {
             return entry != ChasedEntity.CollisionInformation && (entry.CollisionRules.Personal <= CollisionRule.Normal);
@@ -62,7 +62,7 @@ namespace BEPUphysicsDemos
             DistanceToTarget = distanceToTarget;
             ChaseCameraMargin = 1;
 
-            rayCastFilter = RayCastFilter;
+            _rayCastFilter = RayCastFilter;
         }
 
         public override void Update(float dt)
@@ -75,7 +75,7 @@ namespace BEPUphysicsDemos
 
             //Find the earliest ray hit that isn't the chase target to position the camera appropriately.
             RayCastResult result;
-            float cameraDistance = ChasedEntity.Space.RayCast(new Ray(lookAt, backwards), DistanceToTarget, rayCastFilter, out result) ? result.HitData.T : DistanceToTarget;
+            float cameraDistance = ChasedEntity.Space.RayCast(new Ray(lookAt, backwards), DistanceToTarget, _rayCastFilter, out result) ? result.HitData.T : DistanceToTarget;
 
             Camera.Position = lookAt + (Math.Max(cameraDistance - ChaseCameraMargin, 0)) * backwards; //Put the camera just before any hit spot.
 

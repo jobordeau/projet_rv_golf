@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
 using ConversionHelper;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace BEPUphysicsDemos
+namespace Golf.Core.ModelGolf
 {
     /// <summary>
     /// Contains helper methods for extracting vertices and indices from XNA models.

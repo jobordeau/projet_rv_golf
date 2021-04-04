@@ -15,12 +15,12 @@ namespace Golf.Core.ModelGolf
         /// Entity that this model follows.
         /// </summary>
         public Entity Entity { get; }
-        Model model;
+        Model _model;
         /// <summary>
         /// Base transformation to apply to the model.
         /// </summary>
         public BEPUutilities.Matrix Transform;
-        Matrix[] boneTransforms;
+        Matrix[] _boneTransforms;
 
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace Golf.Core.ModelGolf
             : base(game)
         {
             this.Entity = entity;
-            this.model = model;
+            this._model = model;
             this.Transform = transform;
 
             //Collect any bone transformations in the model itself.
             //The default cube model doesn't have any, but this allows the EntityModel to work with more complicated shapes.
-            boneTransforms = new Matrix[model.Bones.Count];
+            _boneTransforms = new Matrix[model.Bones.Count];
             foreach (ModelMesh mesh in model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
@@ -49,6 +49,10 @@ namespace Golf.Core.ModelGolf
             }
         }
 
+        /// <summary>
+        /// Method defining the drawing of the element
+        /// </summary>
+        /// <param name="gameTime">the game time</param>
         public override void Draw(GameTime gameTime)
         {
             //Notice that the entity's worldTransform property is being accessed here.
@@ -59,12 +63,12 @@ namespace Golf.Core.ModelGolf
             Matrix worldMatrix = MathConverter.Convert(Transform * Entity.WorldTransform);
 
 
-            model.CopyAbsoluteBoneTransformsTo(boneTransforms);
-            foreach (ModelMesh mesh in model.Meshes)
+            _model.CopyAbsoluteBoneTransformsTo(_boneTransforms);
+            foreach (ModelMesh mesh in _model.Meshes)
             {
                 foreach (BasicEffect effect in mesh.Effects)
                 {
-                    effect.World = boneTransforms[mesh.ParentBone.Index] * worldMatrix;
+                    effect.World = _boneTransforms[mesh.ParentBone.Index] * worldMatrix;
                     effect.View = MathConverter.Convert((Game as MiniGolf).CameraClassic.ViewMatrix);
                     effect.Projection = MathConverter.Convert((Game as MiniGolf).CameraClassic.ProjectionMatrix);
                 }
