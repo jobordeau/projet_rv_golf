@@ -30,7 +30,7 @@ namespace Golf.Core.ModelGolf
             Form = ball.Form;
         }
 
-        public void Load(Space space, MiniGolf game)
+        public void Load(Space space, Game game)
         {
             space.Add(Form);
             if (Model != null)

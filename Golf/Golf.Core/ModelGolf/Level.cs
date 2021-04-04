@@ -21,7 +21,9 @@ namespace Golf.Core.ModelGolf
         
         public Game Game { get; }
 
+        public BoundingBox BoundingLevel { get; private set; }
         public BoundingBox BoundingArrive { get; private set; }
+
         
 
         public Level(Game game,int levelIndex=1)
@@ -34,10 +36,11 @@ namespace Golf.Core.ModelGolf
 
         }
 
-        public void Load(Space space, MiniGolf game)
+        public void Load(Space space, Game game)
         {
             ModelDataExtractor.GetVerticesAndIndicesFromModel(ModelLevel, out Vector3[] vertices, out int[] indices);
             var meshLevel = new StaticMesh(vertices, indices, new AffineTransform(new Vector3(0, -40, 0)));
+            BoundingLevel = meshLevel.BoundingBox;
             space.Add(meshLevel);
             game.Components.Add(new StaticModel(ModelLevel, meshLevel.WorldTransform.Matrix, game));
 

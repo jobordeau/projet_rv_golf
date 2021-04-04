@@ -14,14 +14,17 @@ namespace Golf.Core.ModelGolf
     public class GameManager
     {
         public LinkedList<Player> Players { get; }
-        public List<Player> Level { get; }
+        public List<Level> Levels { get; }
         public Space Space { get; }
         private MiniGolf game;
-        public Level MainLevel { get; set; }
+        public Level MainLevel { get; private set; }
         public Player MainPlayer { get; private set; }
         private int nbPlayer;
-        private IServiceProvider services;
-        private ContentManager Content;
+        public int LevelIndex { get; private set; } = 1;
+        public bool Loading { get; private set; } = false;
+        public bool Ended { get; private set; } = false;
+        private int numberOfLevels = 4;
+        public int NbHits { get; set; } = 0;
 
 
         public GameManager(MiniGolf game)
@@ -75,5 +78,27 @@ namespace Golf.Core.ModelGolf
                player.ReloadBall(Space);
            }
        }
+
+        public void LoadNextLevel()
+        {
+            Loading = true;
+            // move to the next level
+            LevelIndex += 1;
+            MainPlayer.AddScore(NbHits);
+
+            if (LevelIndex % numberOfLevels == 0)
+            {
+                Ended = true;
+                return;
+            }
+
+            // Unloads the content for the current level before loading the next one.
+            UnloadGame();
+            LoadGame(LevelIndex);
+
+
+            NbHits = 0;
+            Loading = false;
+        }
     }
 }

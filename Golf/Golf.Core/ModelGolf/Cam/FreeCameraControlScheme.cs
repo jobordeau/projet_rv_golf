@@ -35,7 +35,7 @@ namespace Golf.Core.ModelGolf.Cam
             if (Game.GamePadInput.IsButtonDown(Buttons.RightStick))
                 MoveUp(-distance);
 #endif
-
+            /*
             if (Game.KeyboardState.IsKeyDown(Keys.E))
                 Camera.MoveForward(distance);
             if (Game.KeyboardState.IsKeyDown(Keys.D))
@@ -47,7 +47,8 @@ namespace Golf.Core.ModelGolf.Cam
             if (Game.KeyboardState.IsKeyDown(Keys.A))
                 Camera.MoveUp(distance);
             if (Game.KeyboardState.IsKeyDown(Keys.Z))
-                Camera.MoveUp(-distance);
+                Camera.MoveUp(-distance);*/
         }
+
     }
 }
