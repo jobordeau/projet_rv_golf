@@ -31,6 +31,15 @@ L'objectif est bien évidemment de terminer tout les trous avec le moins de coup
 
 Un tableau des score vous sera afficher à la fin de la partie vous récapitulant tout vos scores pour chaques niveaux.
 
+
+## Documentation 
+
+L'intégraliter de la documentation du projet est retrouvable dans le dossier [Documentation](/Documentation). On peut noter tout particulièrement un diagramme de cas d'utilisation un diagramme de classe... On note aussi la présence de la vidéo de présentation :
+
+![Vidéo de présentation du jeu](/Documentation/MiniGolf.mp4)
+
+Une partie de la description de l'architecture est aussi présente dans la partie wiki du git.
+
 ## Manques dû au retards 
 
 Comme cité plus haut, la collision est un élément sur lequel nous nous sommes attardé et qui nous pris un grand nombre d'heures. Ce retard nous à pousser à commencer la logique pur de l'application bien trop tard. C'est pour ça que le jeu est pour le moment seulement en mode joueur unique. Seulement comme nous avons dès le départ l'idée de proposer un mode multijoueur local, des points d'extensions on été mis en place afin de simplifier son implémentation prochaine. De plus, nous voulions proposer notre application sur un grand nombre de plateformes. Seulement, pour l'instant MiniGolf est disponible uniquement en application de bureau Windows. Nous avons donc essayer de fournir un jeu le plus complet possible en très peu de temps.
@@ -38,3 +47,5 @@ Comme cité plus haut, la collision est un élément sur lequel nous nous sommes
 ## Remerciements
 
 Nous remercions M. Nicolas Raymond pour le grand nombre d'heures que celui-ci à passer avec nous en cours et en dehors afin de trouver une solution à la recherche d'un moyen de détection des collisions ainsi que pour le suivi général du projet.
+
+
