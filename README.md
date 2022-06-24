@@ -36,7 +36,9 @@ Un tableau des score vous sera afficher à la fin de la partie vous récapitulan
 
 L'intégraliter de la documentation du projet est retrouvable dans le dossier [Documentation](/Documentation). On peut noter tout particulièrement un diagramme de cas d'utilisation un diagramme de classe... On note aussi la présence de la vidéo de présentation :
 
-![Vidéo de présentation du jeu](/Documentation/MiniGolf.mp4)
+
+https://user-images.githubusercontent.com/74385376/175613161-b7146bfc-40e6-45ec-9396-206df002189e.mp4
+
 
 Une partie de la description de l'architecture est aussi présente dans la partie wiki du git.
 
