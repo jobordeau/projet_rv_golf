@@ -2,6 +2,8 @@
 
 Développement d'un jeu de golf sur desktop réalisé par [Yoann PERIQUOI](https://gitlab.iut-clermont.uca.fr/yoperiquoi) et [Jovann BORDEAU](https://gitlab.iut-clermont.uca.fr/jobordeau) dans le cadre du cours de RV en 2ème année de DUT Informatique supervisé par l'intervenant [M. Nicolas Raymond](https://gitlab.iut-clermont.uca.fr/niraymon).
 
+https://user-images.githubusercontent.com/74385376/175613161-b7146bfc-40e6-45ec-9396-206df002189e.mp4
+
 ## Contexte de l'application
 
 Dans le cadre de notre matière de réalité virtuelle nous avons eu à réaliser une jeu vidéo en duo en 7 semaines grâce à un Framework de développement de jeu vidéo en C#.NET.
@@ -34,13 +36,7 @@ Un tableau des score vous sera afficher à la fin de la partie vous récapitulan
 
 ## Documentation 
 
-L'intégraliter de la documentation du projet est retrouvable dans le dossier [Documentation](/Documentation). On peut noter tout particulièrement un diagramme de cas d'utilisation un diagramme de classe... On note aussi la présence de la vidéo de présentation :
-
-
-https://user-images.githubusercontent.com/74385376/175613161-b7146bfc-40e6-45ec-9396-206df002189e.mp4
-
-
-Une partie de la description de l'architecture est aussi présente dans la partie wiki du git.
+L'intégraliter de la documentation du projet est retrouvable dans le dossier [Documentation](/Documentation).
 
 ## Manques dû au retards 
 
